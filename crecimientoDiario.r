@@ -131,7 +131,7 @@ generateCSVandPlotForConfirmedCasesMovingAverage <- function(casesDataFrame , es
 
 
  result <-1
- return(c(estadoTxt,ultimodiacalculadoR, ultimovalorR))
+ return(c(estadoTxt,ultimodiacalculadoR, as.numeric(ultimovalorR)))
 }
 
 #######################################
@@ -197,7 +197,7 @@ generateCSVandPlotForConfimedDeaths <- function(confirmedDeathsDataFrame , estad
 #######################################
 #download and load into dataframe
 setwd(mydir)
-if (FALSE) {
+if (TRUE) {
 	download.file(myurl, myfile )
 	unzipfile <- unzip (myfile, list = TRUE)
 	unzip (myfile, unzipfile$Name)
@@ -525,4 +525,21 @@ resultadosR<-rbind(resultadosR,data.frame(miR0[1],miR0[2],miR0[3]))
 
 names(resultadosR) <- c("Entidad","Dia","R0")
 print(resultadosR)
-barplot( resultadosR[,c(3)],names.arg=resultadosR[,1],main="ValoresR", las=2)
+
+saveToFile <- TRUE
+
+if (saveToFile == TRUE) {
+#save
+# 1. Open png file
+	setwd(pathToSave)
+	png(paste("All","-R0" ,".png",sep=""), width = 1024, height = 768)
+# 2. Create the plot
+}
+
+barplot(as.numeric(as.matrix(resultadosR)[,3]), names.arg=resultadosR[,1],main="ValoresR", las=2)
+
+if (saveToFile == TRUE) {
+	# 3. Close the file
+	dev.off()
+	write.csv(resultadosR, paste("All","-R0",".csv",sep=""))
+}
