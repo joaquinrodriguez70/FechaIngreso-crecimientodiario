@@ -32,6 +32,7 @@ resultadoConfirmado  = 1
 daysForGraphToCutOff = 7
 movingAverageDays = 7
 sinDefuncion = '9999-99-99'
+resultadosR = data.frame()
 
 ##############################################
 #calculate the average of last x days for a specific column on a data frame and returns a df
@@ -59,7 +60,7 @@ promedioxdias <- function(casospromDF,  dias, nombreColumna){
 #Moving Average CSV and Plot Generation,
 #Confirmed New cases and accumulated , using an average of x days and remove some days due of incomplete data
 ##############################################
-generateCSVandPlotForConfirmedCasesMovingAverage <- function(casesDataFrame , estadoTxt,aretirar, daysToAverage, saveToFile,pathToSave,fileNameTxtIdent){
+generateCSVandPlotForConfirmedCasesMovingAverage <- function(casesDataFrame , estadoTxt,aretirar, daysToAverage, saveToFile,pathToSave,fileNameTxtIdent,poblacion){
 
 	aggregateCasesDataFrame <- aggregate(formula = RESULTADO ~ FECHA_INGRESO,FUN = sum, data = casesDataFrame)
 
@@ -93,7 +94,7 @@ generateCSVandPlotForConfirmedCasesMovingAverage <- function(casesDataFrame , es
 	}
 
 	#Create the plot
-  barplot( head(aggregateCasesDataFrame$RESULTADO,-aretirar),names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-aretirar),main=paste("Nuevos Ingresos",estadoTxt))
+  barplot( head(aggregateCasesDataFrame$RESULTADO,-aretirar),names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-aretirar),main=paste("Nuevos Ingresos",estadoTxt), las=2)
 
 	if (saveToFile == TRUE) {
 		# Close the file
@@ -114,7 +115,7 @@ generateCSVandPlotForConfirmedCasesMovingAverage <- function(casesDataFrame , es
 			setwd(pathToSave)
 			png(paste(estadoTxt,"-R Estimate", ".png",sep=""), width = 800, height = 600)
 		}
-		plot(R_estimate,  options_R = list( xlab =paste("Tiempo",dia_1), ylab = "R"))
+		plot(R_estimate,  options_R = list( xlab =paste("Tiempo Dia 1=",dia_1), ylab = "R"))
 
 		if (saveToFile == TRUE) {
 			dev.off()
@@ -123,7 +124,11 @@ generateCSVandPlotForConfirmedCasesMovingAverage <- function(casesDataFrame , es
 
 		print(R_estimate$R)
 
-
+		maximorenglon <- length(R_estimate$R$`Mean(R)`)
+		maximafecha <- R_estimate$R$t_end[maximorenglon]
+		ultimodiacalculadoR <- aggregateCasesDataFrame[maximafecha,"FECHA_INGRESO"]
+		ultimovalorR <- R_estimate$R$`Mean(R)`[maximorenglon]
+		rbind(resultadosR,c(estadoTxt,as.Date(ultimodiacalculadoR), ultimovalorR))
 
  result <-1
  return(result)
@@ -198,7 +203,7 @@ if (FALSE) {
 	unzip (myfile, unzipfile$Name)
 	confirmedCasesDataFrame <- read.csv ( file=unzipfile$Name)
 } else {
-	confirmedCasesDataFrame <- read.csv ("/media/joaquin/Nuevo_vol/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario/backup/200711COVID19MEXICO.csv")
+	confirmedCasesDataFrame <- read.csv ("/media/joaquin/Nuevo_vol/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario/backup/200712COVID19MEXICO.csv")
 }
 #fill state names
 listaEstados <- c(1:32)
@@ -213,7 +218,7 @@ poblacionEstados <-c(1184996,3155070,637026,822441,2748391,650555,4796580,340646
 confirmedCasesDataFrame  <- confirmedCasesDataFrame [ confirmedCasesDataFrame$RESULTADO == resultadoConfirmado,c("FECHA_INGRESO","RESULTADO","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF")]
 confirmedDeathsDataFrame <- confirmedCasesDataFrame [ confirmedCasesDataFrame$FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","FECHA_INGRESO","RESULTADO")]
 
-generateCSVandPlotForConfirmedCasesMovingAverage (confirmedCasesDataFrame , "Mexico", daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (confirmedCasesDataFrame , "Mexico", daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",130000000)
 generateCSVandPlotForConfimedDeaths (confirmedDeathsDataFrame , "Mexico", daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -226,7 +231,7 @@ for (i in 1:length(listaEstados)) {
   stateCasesDataFrame<- confirmedCasesDataFrame [ confirmedCasesDataFrame$RESULTADO==resultadoConfirmado & confirmedCasesDataFrame$ENTIDAD_RES == i, c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 	stateConfirmedDeathsDataFrame <- stateCasesDataFrame [ confirmedCasesDataFrame$FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
 
-  generateCSVandPlotForConfirmedCasesMovingAverage (stateCasesDataFrame, nombreEstados[[i]],daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+  generateCSVandPlotForConfirmedCasesMovingAverage (stateCasesDataFrame, nombreEstados[[i]],daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg", poblacionEstados[[i]])
 	generateCSVandPlotForConfimedDeaths (stateConfirmedDeathsDataFrame , nombreEstados[[i]], daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 }
@@ -241,7 +246,7 @@ numeroEstados<-c(2)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -252,7 +257,7 @@ numeroEstados<-c(27)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 nombreMunicipios <-"ZM_Cancun"
@@ -262,7 +267,7 @@ numeroEstados<-c(23)
 numeroMunicipios <-c (5)
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 nombreMunicipios <-"ZM_Monterrey"
@@ -272,7 +277,7 @@ numeroEstados<-c(19)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 nombreMunicipios <-"ZM_Veracruz"
@@ -282,7 +287,7 @@ numeroEstados<-c(30)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -293,7 +298,7 @@ numeroEstados<-c(15,9)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -305,7 +310,7 @@ numeroEstados<-c(14)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -318,7 +323,7 @@ numeroEstados<-c(12)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -329,7 +334,7 @@ numeroEstados<-c(16)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 nombreMunicipios <-"ZM_LAZARO_CARDENAS"
@@ -339,7 +344,7 @@ numeroEstados<-c(16)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -350,7 +355,7 @@ numeroEstados<-c(20)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 #puebla
@@ -362,7 +367,7 @@ numeroEstados<-c(21)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 nombreMunicipios <-"ZM_MEXICALI"
@@ -372,7 +377,7 @@ numeroEstados<-c(2)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -383,7 +388,7 @@ numeroEstados<-c(26)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -394,7 +399,7 @@ numeroEstados<-c(7)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -405,7 +410,7 @@ numeroEstados<-c(25)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -416,7 +421,7 @@ numeroEstados<-c(25)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -427,7 +432,7 @@ numeroEstados<-c(1)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -438,7 +443,7 @@ numeroEstados<-c(11)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -450,7 +455,7 @@ numeroEstados<-c(31)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -461,7 +466,7 @@ numeroEstados<-c(8)
 
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
 
 
@@ -485,5 +490,8 @@ nombreMunicipios <-"ZM_LA LAGUNA"
 
 municipalCasesDataFrame <-rbind(municipalCasesDataFrame1,municipalCasesDataFrame2)
 municipalConfirmedDeathsDataFrame <- municipalCasesDataFrame  [ municipalCasesDataFrame $FECHA_DEF!=sinDefuncion  ,c("FECHA_DEF","RESULTADO")]
-generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+generateCSVandPlotForConfirmedCasesMovingAverage (municipalCasesDataFrame, nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 generateCSVandPlotForConfimedDeaths (municipalCasesDataFrame , nombreMunicipios, daysForGraphToCutOff,  movingAverageDays,TRUE,paste(mydir,"/img",sep=""))
+
+
+print(resultadosR)
