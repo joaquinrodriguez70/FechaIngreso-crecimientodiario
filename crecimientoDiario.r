@@ -527,7 +527,7 @@ names(resultadosR) <- c("Entidad","Dia","R0")
 print(resultadosR)
 
 saveToFile <- TRUE
-
+pathToSave<- paste(mydir,"/img",sep="")
 if (saveToFile == TRUE) {
 #save
 # 1. Open png file
