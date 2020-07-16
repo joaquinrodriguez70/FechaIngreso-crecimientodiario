@@ -171,9 +171,6 @@ plotRstates <- function(resultadosR, saveToFile, pathToSave){
 	# Increase margin size
 	par(mar=c(12,4,4,4))
 
-	xx <- barplot(dat$freqs, xaxt = 'n', xlab = '', width = 0.85, ylim = ylim,
-	              main = "Sample Sizes of Various Fitness Traits",
-	              ylab = "Frequency")
 
 	xx <-  barplot(resultadosR[order(-resultadosR$R0),3], names.arg=resultadosR[order(-resultadosR$R0),1],main="ValoresR" ,las=2)
 
@@ -194,7 +191,7 @@ plotRstates <- function(resultadosR, saveToFile, pathToSave){
 
 #download and load into dataframe
 setwd(mydir)
-if (FALSE) {
+if (TRUE) {
 	download.file(myurl, myfile )
 	unzipfile <- unzip (myfile, list = TRUE)
 	unzip (myfile, unzipfile$Name)
