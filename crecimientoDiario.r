@@ -44,9 +44,10 @@ promedioxdias <- function(casospromDF,  dias, nombreColumna){
 
 	for (i in observaciones ) {
 		suma <-0
-		ventana <-c( (i - dias) : i)
+		ventana <-c( (i - dias) : (i-1))
 		for (j in ventana ) {
 			suma= casospromDF[j, nombreColumna] + suma
+			suma
 		}
 		prom <-  suma / dias
 		promedios[i] = prom
