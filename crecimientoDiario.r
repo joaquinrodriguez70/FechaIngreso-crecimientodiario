@@ -151,8 +151,8 @@ generateRandPlot<- function(aggregateCasesDataFrame , estadoTxt,aretirar, daysTo
 
 aggregateCases <- function(casesDataFrame,daysToAverage ){
 
-  campo = "FECHA_INGRESO"
-	aggregateCasesDataFrame <- aggregate(formula = RESULTADO/RESULTADO ~ campo,FUN = sum, data = casesDataFrame)
+	aggregateCasesDataFrame <- aggregate(formula = RESULTADO ~ FECHA_INGRESO , FUN = sum, data = casesDataFrame)
+
 
 	#add running sum
 	aggregateCasesDataFrame[,"RESULTADO_ACUM"]   <- cumsum(aggregateCasesDataFrame$RESULTADO)
@@ -162,6 +162,20 @@ aggregateCases <- function(casesDataFrame,daysToAverage ){
 	return (aggregateCasesDataFrame)
 }
 
+##############################################
+#############################################
+aggregateMortalityCases <- function(casesDataFrame,daysToAverage ){
+
+	aggregateCasesDataFrame <- aggregate(formula = RESULTADO ~ FECHA_DEF , FUN = sum, data = casesDataFrame)
+
+
+	#add running sum
+	aggregateCasesDataFrame[,"RESULTADO_ACUM"]   <- cumsum(aggregateCasesDataFrame$RESULTADO)
+	aggregateCasesDataFrame[,"RESULTADO7D"]      <- promedioxdias(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_ACUM7D"] <- promedioxdias(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
+
+	return (aggregateCasesDataFrame)
+}
 #######################################
 #plotRstates
 #######################################
@@ -226,6 +240,7 @@ miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame , "Mexico", daysForG
 
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (confirmedCasesDataFrame,movingAverageDays ), paste("Mexico","-Mortality",".csv",sep=""))
 
 #######################################
 
@@ -240,6 +255,7 @@ for (i in 1:length(listaEstados)) {
 	miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame, nombreEstados[[i]],daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg", poblacionEstados[[i]])
 
 	resultadosR<-rbind(resultadosR,miR0)
+	write.csv(aggregateMortalityCases (stateCasesDataFrame,movingAverageDays ), paste(nombreEstados[[i]],"-Mortality",".csv",sep=""))
 
 }
 
@@ -258,6 +274,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_Villahermosa"
@@ -271,6 +288,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_Cancun"
@@ -284,6 +302,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_Monterrey"
@@ -297,6 +316,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_Veracruz"
@@ -310,6 +330,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_CDMX"
@@ -323,6 +344,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 #guadalajara
@@ -337,6 +359,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 #acapulco
@@ -352,6 +375,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 
@@ -366,6 +390,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_LAZARO_CARDENAS"
@@ -379,6 +404,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_OAXACA"
@@ -392,6 +418,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 #Puebla
@@ -406,6 +433,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_MEXICALI"
@@ -419,6 +447,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_HERMOSILLO"
@@ -432,6 +461,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_TUXTLA_GUTIERREZ"
@@ -445,6 +475,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_CULIACAN"
@@ -458,6 +489,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_MAZATLAN"
@@ -471,6 +503,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_AGUASCALIENTES"
@@ -484,6 +517,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_LEON"
@@ -497,6 +531,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_MERIDA"
@@ -510,6 +545,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 nombreMunicipios <-"ZM_CD_JUAREZ"
@@ -523,6 +559,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 #JOIN TWO STATES
@@ -549,6 +586,7 @@ aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movi
 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
 resultadosR<-rbind(resultadosR,miR0)
+write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 saveToFile <- TRUE
 pathToSave<- paste(mydir,"/img",sep="")
