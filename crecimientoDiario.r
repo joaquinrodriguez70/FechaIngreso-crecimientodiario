@@ -138,13 +138,21 @@ generateRandPlot<- function(aggregateCasesDataFrame , estadoTxt,aretirar, daysTo
 		return (df)
 }
 
+
+#casos
+#aggregateCasesDataFrame <- aggregate(formula = RESULTADO/RESULTADO ~ FECHA_INGRESO ,FUN = sum, data = casesDataFrame)
+#Defunciones
+#  agregadoDefunciones <- aggregate(formula = RESULTADO/RESULTADO ~ FECHA_DEF,FUN = sum, data =casesDataFrame  )
+
+
 ##############################################
 #Calculate running sums for cases
 ##############################################
 
 aggregateCases <- function(casesDataFrame,daysToAverage ){
 
-	aggregateCasesDataFrame <- aggregate(formula = RESULTADO ~ FECHA_INGRESO,FUN = sum, data = casesDataFrame)
+  campo = "FECHA_INGRESO"
+	aggregateCasesDataFrame <- aggregate(formula = RESULTADO/RESULTADO ~ campo,FUN = sum, data = casesDataFrame)
 
 	#add running sum
 	aggregateCasesDataFrame[,"RESULTADO_ACUM"]   <- cumsum(aggregateCasesDataFrame$RESULTADO)
