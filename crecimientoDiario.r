@@ -192,7 +192,7 @@ plotRstates <- function(resultadosR, saveToFile, pathToSave){
 	}
 
 	# Increase margin size
-	par(mar=c(12,4,4,4))
+	par(mar=c(12,4,12,4))
 
 
 	xx <-  barplot(resultadosR[order(-resultadosR$R0),3], names.arg=resultadosR[order(-resultadosR$R0),1],main="ValoresR" ,las=2)
