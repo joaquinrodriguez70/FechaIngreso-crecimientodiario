@@ -7,7 +7,7 @@
 
 # Gets data from
 #http://187.191.75.115/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip
-
+#http://epidemiologia.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip
 remove(list = ls())
 r = getOption("repos")
 r["CRAN"] = "http://cran.us.r-project.org"
@@ -25,7 +25,7 @@ library(EpiEstim)
 
 
 mydir <-  '/media/joaquin/Nuevo_vol/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario'
-myurl <-  'http://187.191.75.115/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip'
+myurl <-  'http://epidemiologia.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip'
 myfile <- 'datos_abiertos_covid19.zip'
 resultadoConfirmado  = 1
 daysForGraphToCutOff = 7
@@ -68,7 +68,7 @@ generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , estadoTxt
 
 		# Open png file
 
-		png(paste(estadoTxt, "-Acumvscurrent",fileNameTxtIdent ,".png", sep=""), width = 800, height = 600)
+		png(paste(estadoTxt, "-Acumvscurrent",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
 	}
 
 	dia_1 <- aggregateCasesDataFrame[1,"FECHA_INGRESO"]
@@ -76,7 +76,11 @@ generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , estadoTxt
 	maximafecha <-aggregateCasesDataFrame[maximorenglon-aretirar,"FECHA_INGRESO"]
 
 	# Create the plot
-	plot(x = head(aggregateCasesDataFrame$RESULTADO_ACUM7D,-aretirar), y = head(aggregateCasesDataFrame$RESULTADO7D,-aretirar) ,xlab = paste("Acumulados Confirmados promedio ", aretirar," dias"), ylab="Nuevos",main=paste(estadoTxt,dia_1,"a",maximafecha), log="xy")
+	plot(x = head(aggregateCasesDataFrame$RESULTADO_ACUM7D,-aretirar),
+	     y = head(aggregateCasesDataFrame$RESULTADO7D,-aretirar) ,
+			 xlab = paste("Acumulados Confirmados promedio ", aretirar," dias"),
+			 ylab="Nuevos",main=paste(estadoTxt,dia_1,"a",maximafecha),
+			 log="xy")
 	with (aggregateCasesDataFrame, lines(x = head( aggregateCasesDataFrame$RESULTADO_ACUM7D,-aretirar), y = head(aggregateCasesDataFrame$RESULTADO7D, -aretirar),col="red"))
 
 	if (saveToFile == TRUE) {
@@ -86,11 +90,15 @@ generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , estadoTxt
 
       #EpidemicCurve Name
 
-   		png(paste(estadoTxt, "-Casos",fileNameTxtIdent ,".png", sep=""), width = 800, height = 600)
+   		png(paste(estadoTxt, "-Casos",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
 	}
 
 	#Create the plot
-  barplot( head(aggregateCasesDataFrame$RESULTADO,-aretirar),names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-aretirar),main=paste("Nuevos Ingresos",estadoTxt,dia_1,"a",maximafecha), las=2)
+  barplot( head(aggregateCasesDataFrame$RESULTADO,-aretirar),
+	         names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-aretirar),
+					 main=paste("Nuevos Ingresos",estadoTxt,dia_1,"a",maximafecha),
+					 las=2,
+					 col ="#0066cc")
 
 	if (saveToFile == TRUE) {
 		# Close the file
@@ -122,9 +130,11 @@ generateRandPlot<- function(aggregateCasesDataFrame , estadoTxt,aretirar, daysTo
 
 		if (saveToFile == TRUE) {
 			setwd(pathToSave)
-			png(paste(estadoTxt,"-R Estimate", ".png",sep=""), width = 800, height = 600)
+			png(paste(estadoTxt,"-R Estimate", ".png",sep=""), width = 1024, height = 768)
 		}
-		plot(R_estimate,  options_R = list( xlab =paste(estadoTxt," Del",dia_1, "al",ultimodiacalculadoR, "Rt:",ultimovalorR ), ylab = "R"))
+		plot(R_estimate,
+    options_I = list(col ="#0066cc",  ylab = "Incidencia"),
+		options_R = list( xlab =paste(estadoTxt," Del",dia_1, "al",ultimodiacalculadoR, "Rt:",ultimovalorR ), ylab = "R"))
 
 		if (saveToFile == TRUE) {
 			dev.off()
@@ -192,13 +202,13 @@ plotRstates <- function(resultadosR, saveToFile, pathToSave){
 	}
 
 	# Increase margin size
-	par(mar=c(12,4,12,4))
+	par(mar=c(12,4,4,4))
+   colores = ifelse( resultadosR[order(-resultadosR$R0),3]  > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
 
-
-	xx <-  barplot(resultadosR[order(-resultadosR$R0),3], names.arg=resultadosR[order(-resultadosR$R0),1],main="ValoresR" ,las=2)
+	xx <-  barplot(resultadosR[order(-resultadosR$R0),3], names.arg=resultadosR[order(-resultadosR$R0),1],main="ValoresR" ,las=2, col=colores)
 
 	## Add text at top of bars
-	text(x = xx, y = resultadosR[order(-resultadosR$R0),3], label = round(resultadosR[order(-resultadosR$R0),3], digits=2), pos = 3, cex = 0.6, col = "red")
+	text(x = xx, y = resultadosR[order(-resultadosR$R0),3], label = round(resultadosR[order(-resultadosR$R0),3], digits=2), pos = 1, cex = 0.5, col = "red")
 
 	if (saveToFile == TRUE) {
 		# 3. Close the file
