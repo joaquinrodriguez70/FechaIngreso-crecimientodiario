@@ -2,7 +2,7 @@
 #CSV and Plot Generation for confirmed covid cases in Mexico by detection Date (FECHA_INGRESO)
 #  Considering confirmed New cases and accumulated , using an average of x days and cutting off 7 days due of incomplete data
 #  giving a CSV as a result
-#  , "","FECHA_INGRESO","RESULTADO","RESULTADO_ACUM","RESULTADO7D","RESULTADO_ACUM7D"
+#  , "","FECHA_INGRESO","RESULTADO","RESULTADO_ACUM","RESULTADO_average7D","RESULTADO_averageACUM7D"
 #R estimate for the above values
 
 # Gets data from
@@ -27,33 +27,72 @@ library(EpiEstim)
 mydir <-  '/media/joaquin/Nuevo_vol/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario'
 myurl <-  'http://epidemiologia.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip'
 myfile <- 'datos_abiertos_covid19.zip'
-resultadoConfirmado  = 1
+confirmedResult  = 1
 daysForGraphToCutOff = 7
 movingAverageDays = 7
-sinDefuncion = '9999-99-99'
+notDead = '9999-99-99'
 resultadosR = data.frame(stringsAsFactors = FALSE)
 
 ##############################################
-#calculate the average of last x days for a specific column on a data frame and returns a df
+#calculate the average of last week ( x days) for a specific column on a data frame and returns a data frame
 ##############################################
-promedioxdias <- function(casospromDF,  dias, nombreColumna){
+xDaysAverage <- function(averageCasesDataFrame,  days, columnName){
 	#fill vector with zeroes
-	promedios<- rep(0, length(casospromDF[,1]))
-	#we are going to calculate starting at dias  position, to correcly calculate the average
-	observaciones <-  c((dias+1):length (casospromDF[,1]) )
+	averageVector<- rep(0, length(averageCasesDataFrame[,1]))
+	#we are going to calculate starting at days  position, to correcly calculate the average
+	measureVector <-  c((days+1):length (averageCasesDataFrame[,1]) )
 
-	for (i in observaciones ) {
-		suma <-0
-		ventana <-c( (i - dias) : (i-1))
-		for (j in ventana ) {
-			suma= casospromDF[j, nombreColumna] + suma
-			suma
+	for (i in measureVector ) {
+		sum <-0
+		window <-c( (i - days) : (i-1))
+		for (j in window ) {
+			sum= averageCasesDataFrame[j, columnName] + sum
+
 		}
-		prom <-  suma / dias
-		promedios[i] = prom
+		average <-  sum / days
+		averageVector[i] = average
 	}
 
-	return(promedios)
+	return(averageVector)
+}
+
+
+##############################################
+#calculate the weekly ( last x days) for a specific column on a data frame and returns a dataframe
+##############################################
+sumxdays <- function(averageCasesDataFrame,  days, columnName){
+	#fill vector with zeroes
+	sums<- rep(0, length(averageCasesDataFrame[,1]))
+	#we are going to calculate starting at days  position, to correcly calculate the average
+	measureVector <-  c((days+1):length (averageCasesDataFrame[,1]) )
+
+	for (i in measureVector ) {
+		sum <-0
+		window <-c( (i - days) : (i-1))
+		for (j in window ) {
+			sum= averageCasesDataFrame[j, columnName] + sum
+		}
+		sums[i] = sum
+	}
+
+	return(sums)
+}
+
+
+##############################################
+#calculate the weekly ( last x days) for a specific column on a data frame and returns a dataframe
+##############################################
+Weeklynewcases <- function(averageCasesDataFrame,  days, columnName){
+	#fill vector with zeroes
+	sums<- rep(0, length(averageCasesDataFrame[,1]))
+	#we are going to calculate starting at days  position, to correcly calculate the average
+	measureVector <-  c((days+1):length (averageCasesDataFrame[,1]) )
+
+	for (i in measureVector ) {
+			sums[i]= averageCasesDataFrame[i, columnName] - averageCasesDataFrame[i-days, columnName]
+	}
+
+	return(sums)
 }
 
 
@@ -62,36 +101,35 @@ promedioxdias <- function(casospromDF,  dias, nombreColumna){
 #############################################
 generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , estadoTxt,aretirar, daysToAverage, saveToFile,pathToSave,fileNameTxtIdent,poblacion){
 
-# Generate Plot accumulated vs current
-	setwd(pathToSave)
-	if (saveToFile == TRUE) {
+  print(paste("Generando ->",estadoTxt))
 
-		# Open png file
 
-		png(paste(estadoTxt, "-Acumvscurrent",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
-	}
 
 	dia_1 <- aggregateCasesDataFrame[1,"FECHA_INGRESO"]
 	maximorenglon <- length(aggregateCasesDataFrame[,"FECHA_INGRESO"])
 	maximafecha <-aggregateCasesDataFrame[maximorenglon-aretirar,"FECHA_INGRESO"]
 
+	# Generate Plot accumulated vs current
+	setwd(pathToSave)
+
+	# Open png file
+	png(paste(estadoTxt, "-Acumvscurrent",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
+
 	# Create the plot
-	plot(x = head(aggregateCasesDataFrame$RESULTADO_ACUM7D,-aretirar),
-	     y = head(aggregateCasesDataFrame$RESULTADO7D,-aretirar) ,
-			 xlab = paste("Acumulados Confirmados promedio ", aretirar," dias"),
+	plot(x = head(aggregateCasesDataFrame$RESULTADO_averageACUM7D,-aretirar),
+	     y = head(aggregateCasesDataFrame$RESULTADO_average7D,-aretirar) ,
+			 xlab = paste("Acumulados Confirmados averageedio ", aretirar," days"),
 			 ylab="Nuevos",main=paste(estadoTxt,dia_1,"a",maximafecha),
 			 log="xy")
-	with (aggregateCasesDataFrame, lines(x = head( aggregateCasesDataFrame$RESULTADO_ACUM7D,-aretirar), y = head(aggregateCasesDataFrame$RESULTADO7D, -aretirar),col="red"))
+	with (aggregateCasesDataFrame, lines(x = head( aggregateCasesDataFrame$RESULTADO_averageACUM7D,-aretirar),
+	                                     y = head(aggregateCasesDataFrame$RESULTADO_average7D,     -aretirar),col="red"))
+	dev.off()
 
-	if (saveToFile == TRUE) {
+	write.csv(aggregateCasesDataFrame,paste(estadoTxt,fileNameTxtIdent,".csv", sep=""))
 
-			dev.off()
-			write.csv(aggregateCasesDataFrame,paste(estadoTxt,fileNameTxtIdent,".csv", sep=""))
+  #EpidemicCurve Name
 
-      #EpidemicCurve Name
-
-   		png(paste(estadoTxt, "-Casos",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
-	}
+  png(paste(estadoTxt, "-Casos",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
 
 	#Create the plot
   barplot( head(aggregateCasesDataFrame$RESULTADO,-aretirar),
@@ -100,10 +138,22 @@ generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , estadoTxt
 					 las=2,
 					 col ="#0066cc")
 
-	if (saveToFile == TRUE) {
-		# Close the file
-		dev.off()
-   }
+	dev.off()
+
+	#weeklyChange curve
+
+	colores = ifelse( head(aggregateCasesDataFrame$RESULTADO_DIFSUM7D,-aretirar) > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
+	png(paste(estadoTxt, "-CasosVsSemAnt",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
+
+	#Create the plot
+	barplot( head(aggregateCasesDataFrame$RESULTADO_DIFSUM7D,-aretirar),
+					 names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-aretirar),
+					 main=paste("Nuevos Ingresos esta semana vs semana anterior",estadoTxt,dia_1,"a",maximafecha),
+					 las=2,
+					 col = colores)
+
+	dev.off()
+
 }
 
 
@@ -128,20 +178,17 @@ generateRandPlot<- function(aggregateCasesDataFrame , estadoTxt,aretirar, daysTo
 
 		#	 plot Restimates
 
-		if (saveToFile == TRUE) {
-			setwd(pathToSave)
-			png(paste(estadoTxt,"-R Estimate", ".png",sep=""), width = 1024, height = 768)
-		}
+
+		setwd(pathToSave)
+		png(paste(estadoTxt,"-R Estimate", ".png",sep=""), width = 1024, height = 768)
+
 		plot(R_estimate,
     options_I = list(col ="#0066cc",  ylab = "Incidencia"),
 		options_R = list( xlab =paste(estadoTxt," Del",dia_1, "al",ultimodiacalculadoR, "Rt:",ultimovalorR ), ylab = "R"))
 
-		if (saveToFile == TRUE) {
-			dev.off()
-			write.csv(R_estimate$R, paste(estadoTxt,"-R Estimate",".csv",sep=""))
-		}
+		dev.off()
+		write.csv(R_estimate$R, paste(estadoTxt,"-R Estimate",".csv",sep=""))
 
-		print(R_estimate$R)
 
 		df <- data.frame(estadoTxt,ultimodiacalculadoR, ultimovalorR)
 		colnames(df) <- c("Entidad","Dia","R0")
@@ -165,10 +212,11 @@ aggregateCases <- function(casesDataFrame,daysToAverage ){
 
 
 	#add running sum
-	aggregateCasesDataFrame[,"RESULTADO_ACUM"]   <- cumsum(aggregateCasesDataFrame$RESULTADO)
-	aggregateCasesDataFrame[,"RESULTADO7D"]      <- promedioxdias(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_ACUM7D"] <- promedioxdias(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
-
+	aggregateCasesDataFrame[,"RESULTADO_ACUM"]        <- cumsum(aggregateCasesDataFrame$RESULTADO)
+	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"]  <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
+	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- sumxdays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- Weeklynewcases (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
 	return (aggregateCasesDataFrame)
 }
 
@@ -181,8 +229,10 @@ aggregateMortalityCases <- function(casesDataFrame,daysToAverage ){
 
 	#add running sum
 	aggregateCasesDataFrame[,"RESULTADO_ACUM"]   <- cumsum(aggregateCasesDataFrame$RESULTADO)
-	aggregateCasesDataFrame[,"RESULTADO7D"]      <- promedioxdias(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_ACUM7D"] <- promedioxdias(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
+	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"] <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
+	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- sumxdays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- Weeklynewcases (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
 
 	return (aggregateCasesDataFrame)
 }
@@ -193,28 +243,22 @@ aggregateMortalityCases <- function(casesDataFrame,daysToAverage ){
 plotRstates <- function(resultadosR, saveToFile, pathToSave){
 	names(resultadosR) <- c("Entidad","Dia","R0")
 	print(resultadosR)
-	if (saveToFile == TRUE) {
-	#save
-	# 1. Open png file
-		setwd(pathToSave)
-		png(paste("All","-R0" ,".png",sep=""), width = 1024, height = 768)
-	# 2. Create the plot
-	}
+	setwd(pathToSave)
+	png(paste("All","-R0" ,".png",sep=""), width = 1024, height = 768)
 
 	# Increase margin size
 	par(mar=c(12,4,4,4))
-   colores = ifelse( resultadosR[order(-resultadosR$R0),3]  > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
+  colores = ifelse( resultadosR[order(-resultadosR$R0),3]  > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
 
-	xx <-  barplot(resultadosR[order(-resultadosR$R0),3], names.arg=resultadosR[order(-resultadosR$R0),1],main="ValoresR" ,las=2, col=colores)
+	xx <-  barplot(resultadosR[order(-resultadosR$R0),3], names.arg=resultadosR[order(-resultadosR$R0),1],main="ValoresR" ,las=2,
+	                col=colores)
 
 	## Add text at top of bars
-	text(x = xx, y = resultadosR[order(-resultadosR$R0),3], label = round(resultadosR[order(-resultadosR$R0),3], digits=2), pos = 1, cex = 0.5, col = "red")
+	text(x = xx, y = resultadosR[order(-resultadosR$R0),3], label = round(resultadosR[order(-resultadosR$R0),3], digits=2),
+	     pos = 1, cex = 0.5, col = "red")
 
-	if (saveToFile == TRUE) {
-		# 3. Close the file
-		dev.off()
-		write.csv(resultadosR, paste("All","-R0",".csv",sep=""))
-	}
+ 	dev.off()
+	write.csv(resultadosR, paste("All","-R0",".csv",sep=""))
 
 }
 
@@ -224,13 +268,13 @@ plotRstates <- function(resultadosR, saveToFile, pathToSave){
 
 #download and load into dataframe
 setwd(mydir)
-if (TRUE) {
+if (FALSE) {
 	download.file(myurl, myfile )
 	unzipfile <- unzip (myfile, list = TRUE)
 	unzip (myfile, unzipfile$Name)
 	confirmedCasesDataFrame <- read.csv ( file=unzipfile$Name)
 } else {
-	confirmedCasesDataFrame <- read.csv ("/media/joaquin/Nuevo_vol/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario/backup/200715COVID19MEXICO.csv")
+	confirmedCasesDataFrame <- read.csv ("/media/joaquin/Nuevo_vol/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario/backup/200802COVID19MEXICO.csv")
 }
 #fill state names
 listaEstados <- c(1:32)
@@ -243,11 +287,11 @@ poblacionEstados <-c(1184996,3155070,637026,822441,2748391,650555,4796580,340646
 #######################################
 #Keep only confirmed case
 
-confirmedCasesDataFrame  <- confirmedCasesDataFrame [ confirmedCasesDataFrame$RESULTADO == resultadoConfirmado,c("FECHA_INGRESO","RESULTADO","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF")]
+confirmedCasesDataFrame  <- confirmedCasesDataFrame [ confirmedCasesDataFrame$RESULTADO == confirmedResult,c("FECHA_INGRESO","RESULTADO","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF")]
 aggregateconfirmedCasesDataFrame  <-aggregateCases (confirmedCasesDataFrame,movingAverageDays )
          generatePlotAccumulatedVSCurrent      (aggregateconfirmedCasesDataFrame , "Mexico", daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",130000000)
-miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame , "Mexico", daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",130000000)
 
+				 miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame , "Mexico", daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",130000000)
 
 resultadosR<-rbind(resultadosR,miR0)
 write.csv(aggregateMortalityCases (confirmedCasesDataFrame,movingAverageDays ), paste("Mexico","-Mortality",".csv",sep=""))
@@ -258,7 +302,7 @@ write.csv(aggregateMortalityCases (confirmedCasesDataFrame,movingAverageDays ), 
 for (i in 1:length(listaEstados)) {
 
 #Arguments: dataframe with country wide cases, state number, state name	, cut-off days, cases' number of days to average  , savetoFile, path
-  stateCasesDataFrame<- confirmedCasesDataFrame [ confirmedCasesDataFrame$RESULTADO==resultadoConfirmado & confirmedCasesDataFrame$ENTIDAD_RES == i, c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
+  stateCasesDataFrame<- confirmedCasesDataFrame [ confirmedCasesDataFrame$RESULTADO==confirmedResult & confirmedCasesDataFrame$ENTIDAD_RES == i, c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
   aggregateconfirmedCasesDataFrame  <-aggregateCases (stateCasesDataFrame,movingAverageDays )
 	         generatePlotAccumulatedVSCurrent      (aggregateconfirmedCasesDataFrame, nombreEstados[[i]],daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg", poblacionEstados[[i]])
 	miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame, nombreEstados[[i]],daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg", poblacionEstados[[i]])
@@ -338,7 +382,6 @@ nombreMunicipios <-"ZM_MANZANILLO"
 numeroMunicipios <-c (7)
 numeroEstados<-c(6)
 
-
 municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
 aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movingAverageDays )
          generatePlotAccumulatedVSCurrent (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
@@ -353,13 +396,13 @@ numeroMunicipios <-c (8)
 numeroEstados<-c(6)
 
 
-municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
-aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movingAverageDays )
-         generatePlotAccumulatedVSCurrent (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+#municipalCasesDataFrame <- confirmedCasesDataFrame[confirmedCasesDataFrame$ENTIDAD_RES %in% numeroEstados & confirmedCasesDataFrame$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO","FECHA_DEF")]
+#aggregateconfirmedCasesDataFrame  <-aggregateCases (municipalCasesDataFrame,movingAverageDays )
+#         generatePlotAccumulatedVSCurrent (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+#miR0 <- generateRandPlot  (aggregateconfirmedCasesDataFrame  , nombreMunicipios ,daysForGraphToCutOff , movingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
 
-resultadosR<-rbind(resultadosR,miR0)
-write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
+#resultadosR<-rbind(resultadosR,miR0)
+#write.csv(aggregateMortalityCases (municipalCasesDataFrame,movingAverageDays ), paste(nombreMunicipios,"-Mortality",".csv",sep=""))
 
 
 
