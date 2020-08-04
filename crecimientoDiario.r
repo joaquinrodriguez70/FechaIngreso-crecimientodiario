@@ -34,7 +34,7 @@ notDead = '9999-99-99'
 resultadosR = data.frame(stringsAsFactors = FALSE)
 
 ##############################################
-#calculate the average of last week ( x days) for a specific column on a data frame and returns a data frame
+# for a specific column  calculates the average of the last x days
 ##############################################
 xDaysAverage <- function(averageCasesDataFrame,  days, columnName){
 	#fill vector with zeroes
@@ -58,7 +58,7 @@ xDaysAverage <- function(averageCasesDataFrame,  days, columnName){
 
 
 ##############################################
-#calculate the weekly ( last x days) for a specific column on a data frame and returns a dataframe
+# for a specific column calculates the sum of the  last x days
 ##############################################
 sumxdays <- function(averageCasesDataFrame,  days, columnName){
 	#fill vector with zeroes
@@ -80,12 +80,12 @@ sumxdays <- function(averageCasesDataFrame,  days, columnName){
 
 
 ##############################################
-#calculate the weekly ( last x days) for a specific column on a data frame and returns a dataframe
+# for a specific column calculate the difference between the weekly average of today and the weekly average of last week
 ##############################################
-Weeklynewcases <- function(averageCasesDataFrame,  days, columnName){
+differenceBetweenTodayandxdaysAverages <- function(averageCasesDataFrame,  days, columnName){
 	#fill vector with zeroes
 	sums<- rep(0, length(averageCasesDataFrame[,1]))
-	#we are going to calculate starting at days  position, to correcly calculate the average
+	#we are going to calculate starting at days  position, to correctly calculate the average
 	measureVector <-  c((days+1):length (averageCasesDataFrame[,1]) )
 
 	for (i in measureVector ) {
@@ -99,42 +99,40 @@ Weeklynewcases <- function(averageCasesDataFrame,  days, columnName){
 #############################################
 #Plot Accumulated VS Current cases
 #############################################
-generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , estadoTxt,aretirar, daysToAverage, saveToFile,pathToSave,fileNameTxtIdent,poblacion){
+generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, saveToFile,pathToSave,fileNameTxtIdent,poblacion){
 
-  print(paste("Generando ->",estadoTxt))
+  print(paste("Calculating ->",ProvinceTxt))
 
-
-
-	dia_1 <- aggregateCasesDataFrame[1,"FECHA_INGRESO"]
-	maximorenglon <- length(aggregateCasesDataFrame[,"FECHA_INGRESO"])
-	maximafecha <-aggregateCasesDataFrame[maximorenglon-aretirar,"FECHA_INGRESO"]
+	day_1 <- aggregateCasesDataFrame[1,"FECHA_INGRESO"]
+	maxRow <- length(aggregateCasesDataFrame[,"FECHA_INGRESO"])
+	maxDate <-aggregateCasesDataFrame[maxRow-daysToIgnore,"FECHA_INGRESO"]
 
 	# Generate Plot accumulated vs current
 	setwd(pathToSave)
 
 	# Open png file
-	png(paste(estadoTxt, "-Acumvscurrent",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
+	png(paste(ProvinceTxt, "-Acumvscurrent",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
 
 	# Create the plot
-	plot(x = head(aggregateCasesDataFrame$RESULTADO_averageACUM7D,-aretirar),
-	     y = head(aggregateCasesDataFrame$RESULTADO_average7D,-aretirar) ,
-			 xlab = paste("Acumulados Confirmados averageedio ", aretirar," days"),
-			 ylab="Nuevos",main=paste(estadoTxt,dia_1,"a",maximafecha),
+	plot(x = head(aggregateCasesDataFrame$RESULTADO_averageACUM7D,-daysToIgnore),
+	     y = head(aggregateCasesDataFrame$RESULTADO_average7D,-daysToIgnore) ,
+			 xlab = paste("Acumulados Confirmados averageedio ", daysToIgnore," days"),
+			 ylab="Nuevos",main=paste(ProvinceTxt,day_1,"a",maxDate),
 			 log="xy")
-	with (aggregateCasesDataFrame, lines(x = head( aggregateCasesDataFrame$RESULTADO_averageACUM7D,-aretirar),
-	                                     y = head(aggregateCasesDataFrame$RESULTADO_average7D,     -aretirar),col="red"))
+	with (aggregateCasesDataFrame, lines(x = head( aggregateCasesDataFrame$RESULTADO_averageACUM7D,-daysToIgnore),
+	                                     y = head(aggregateCasesDataFrame$RESULTADO_average7D,     -daysToIgnore),col="red"))
 	dev.off()
 
-	write.csv(aggregateCasesDataFrame,paste(estadoTxt,fileNameTxtIdent,".csv", sep=""))
+	write.csv(aggregateCasesDataFrame,paste(ProvinceTxt,fileNameTxtIdent,".csv", sep=""))
 
   #EpidemicCurve Name
 
-  png(paste(estadoTxt, "-Casos",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
+  png(paste(ProvinceTxt, "-Casos",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
 
 	#Create the plot
-  barplot( head(aggregateCasesDataFrame$RESULTADO,-aretirar),
-	         names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-aretirar),
-					 main=paste("Nuevos Ingresos",estadoTxt,dia_1,"a",maximafecha),
+  barplot( head(aggregateCasesDataFrame$RESULTADO,-daysToIgnore),
+	         names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-daysToIgnore),
+					 main=paste("Nuevos Ingresos",ProvinceTxt,day_1,"a",maxDate),
 					 las=2,
 					 col ="#0066cc")
 
@@ -142,13 +140,13 @@ generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , estadoTxt
 
 	#weeklyChange curve
 
-	colores = ifelse( head(aggregateCasesDataFrame$RESULTADO_DIFSUM7D,-aretirar) > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
-	png(paste(estadoTxt, "-CasosVsSemAnt",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
+	colores = ifelse( head(aggregateCasesDataFrame$RESULTADO_DIFSUM7D,-daysToIgnore) > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
+	png(paste(ProvinceTxt, "-CasosVsSemAnt",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
 
 	#Create the plot
-	barplot( head(aggregateCasesDataFrame$RESULTADO_DIFSUM7D,-aretirar),
-					 names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-aretirar),
-					 main=paste("Nuevos Ingresos esta semana vs semana anterior",estadoTxt,dia_1,"a",maximafecha),
+	barplot( head(aggregateCasesDataFrame$RESULTADO_DIFSUM7D,-daysToIgnore),
+					 names.arg=head(aggregateCasesDataFrame$FECHA_INGRESO,-daysToIgnore),
+					 main=paste("Nuevos Ingresos esta semana vs semana anterior",ProvinceTxt,day_1,"a",maxDate),
 					 las=2,
 					 col = colores)
 
@@ -160,46 +158,41 @@ generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , estadoTxt
 #############################################
 #Calculate R Estimation and Plot
 #############################################
-generateRandPlot<- function(aggregateCasesDataFrame , estadoTxt,aretirar, daysToAverage, saveToFile,pathToSave,fileNameTxtIdent,poblacion){
+generateRandPlot<- function(aggregateCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, saveToFile,pathToSave,fileNameTxtIdent,poblacion){
 
 
 		#######################
 		#Restimate
 		######################
-		R_estimate <- estimate_R(head(aggregateCasesDataFrame$RESULTADO,-aretirar) ,method = "parametric_si",
+		R_estimate <- estimate_R(head(aggregateCasesDataFrame$RESULTADO,-daysToIgnore) ,method = "parametric_si",
 											config = make_config(list(
 											mean_si = 3.9, std_si = 4.5)))
 
-		dia_1 <- aggregateCasesDataFrame[1,"FECHA_INGRESO"]
-		maximorenglon <- length(R_estimate$R$`Mean(R)`)
-		maximafecha <- R_estimate$R$t_end[maximorenglon]
-		ultimodiacalculadoR <- aggregateCasesDataFrame[maximafecha,"FECHA_INGRESO"]
-		ultimovalorR <- R_estimate$R$`Mean(R)`[maximorenglon]
+		day_1 <- aggregateCasesDataFrame[1,"FECHA_INGRESO"]
+		maxRow <- length(R_estimate$R$`Mean(R)`)
+		maxDate <- R_estimate$R$t_end[maxRow]
+		latestdayinR0Estimation<- aggregateCasesDataFrame[maxDate,"FECHA_INGRESO"]
+		latestR0Value <- R_estimate$R$`Mean(R)`[maxRow]
 
 		#	 plot Restimates
 
 
 		setwd(pathToSave)
-		png(paste(estadoTxt,"-R Estimate", ".png",sep=""), width = 1024, height = 768)
+		png(paste(ProvinceTxt,"-R Estimate", ".png",sep=""), width = 1024, height = 768)
 
 		plot(R_estimate,
     options_I = list(col ="#0066cc",  ylab = "Incidencia"),
-		options_R = list( xlab =paste(estadoTxt," Del",dia_1, "al",ultimodiacalculadoR, "Rt:",ultimovalorR ), ylab = "R"))
+		options_R = list( xlab =paste(ProvinceTxt," Del",day_1, "al",latestdayinR0Estimation, "Rt:",latestR0Value ), ylab = "R"))
 
 		dev.off()
-		write.csv(R_estimate$R, paste(estadoTxt,"-R Estimate",".csv",sep=""))
+		write.csv(R_estimate$R, paste(ProvinceTxt,"-R Estimate",".csv",sep=""))
 
 
-		df <- data.frame(estadoTxt,ultimodiacalculadoR, ultimovalorR)
+		df <- data.frame(ProvinceTxt,latestdayinR0Estimation, latestR0Value)
 		colnames(df) <- c("Entidad","Dia","R0")
 		return (df)
 }
 
-
-#casos
-#aggregateCasesDataFrame <- aggregate(formula = RESULTADO/RESULTADO ~ FECHA_INGRESO ,FUN = sum, data = casesDataFrame)
-#Defunciones
-#  agregadoDefunciones <- aggregate(formula = RESULTADO/RESULTADO ~ FECHA_DEF,FUN = sum, data =casesDataFrame  )
 
 
 ##############################################
@@ -216,7 +209,7 @@ aggregateCases <- function(casesDataFrame,daysToAverage ){
 	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
 	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"]  <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
 	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- sumxdays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- Weeklynewcases (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
+	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- differenceBetweenTodayandxdaysAverages (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
 	return (aggregateCasesDataFrame)
 }
 
@@ -232,7 +225,7 @@ aggregateMortalityCases <- function(casesDataFrame,daysToAverage ){
 	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
 	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"] <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
 	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- sumxdays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- Weeklynewcases (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
+	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- differenceBetweenTodayandxdaysAverages (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
 
 	return (aggregateCasesDataFrame)
 }
@@ -268,7 +261,7 @@ plotRstates <- function(resultadosR, saveToFile, pathToSave){
 
 #download and load into dataframe
 setwd(mydir)
-if (FALSE) {
+if (TRUE) {
 	download.file(myurl, myfile )
 	unzipfile <- unzip (myfile, list = TRUE)
 	unzip (myfile, unzipfile$Name)
