@@ -36,7 +36,7 @@ resultadosR = data.frame(stringsAsFactors = FALSE)
 ##############################################
 # for a specific column  calculates the average of the last x days
 ##############################################
-xDaysAverage <- function(averageCasesDataFrame,  days, columnName){
+Aux_averageForNDays <- function(averageCasesDataFrame,  days, columnName){
 	#fill vector with zeroes
 	averageVector<- rep(0, length(averageCasesDataFrame[,1]))
 	#we are going to calculate starting at days  position, to correcly calculate the average
@@ -60,7 +60,7 @@ xDaysAverage <- function(averageCasesDataFrame,  days, columnName){
 ##############################################
 # for a specific column calculates the sum of the  last x days
 ##############################################
-sumxdays <- function(averageCasesDataFrame,  days, columnName){
+Aux_sumForNDays <- function(averageCasesDataFrame,  days, columnName){
 	#fill vector with zeroes
 	sums<- rep(0, length(averageCasesDataFrame[,1]))
 	#we are going to calculate starting at days  position, to correcly calculate the average
@@ -82,7 +82,7 @@ sumxdays <- function(averageCasesDataFrame,  days, columnName){
 ##############################################
 # for a specific column calculate the difference between the weekly average of today and the weekly average of last week
 ##############################################
-differenceBetweenTodayandxdaysAverages <- function(averageCasesDataFrame,  days, columnName){
+differenceBetweenTodayandAux_averageForNDayss <- function(averageCasesDataFrame,  days, columnName){
 	#fill vector with zeroes
 	sums<- rep(0, length(averageCasesDataFrame[,1]))
 	#we are going to calculate starting at days  position, to correctly calculate the average
@@ -125,6 +125,16 @@ generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , ProvinceT
 
 	write.csv(aggregateCasesDataFrame,paste(ProvinceTxt,fileNameTxtIdent,".csv", sep=""))
 
+}
+
+generateEpidemicCurve <- function(aggregateCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, saveToFile,pathToSave,fileNameTxtIdent,poblacion){
+
+	  print(paste("Calculating ->",ProvinceTxt))
+
+		day_1 <- aggregateCasesDataFrame[1,"FECHA_INGRESO"]
+		maxRow <- length(aggregateCasesDataFrame[,"FECHA_INGRESO"])
+		maxDate <-aggregateCasesDataFrame[maxRow-daysToIgnore,"FECHA_INGRESO"]
+
   #EpidemicCurve Name
 
   png(paste(ProvinceTxt, "-Casos",fileNameTxtIdent ,".png", sep=""), width = 1024, height = 768)
@@ -137,6 +147,8 @@ generatePlotAccumulatedVSCurrent <- function(aggregateCasesDataFrame , ProvinceT
 					 col ="#0066cc")
 
 	dev.off()
+}
+
 
 	#weeklyChange curve
 
@@ -206,10 +218,10 @@ aggregateCases <- function(casesDataFrame,daysToAverage ){
 
 	#add running sum
 	aggregateCasesDataFrame[,"RESULTADO_ACUM"]        <- cumsum(aggregateCasesDataFrame$RESULTADO)
-	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"]  <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
-	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- sumxdays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- differenceBetweenTodayandxdaysAverages (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
+	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- Aux_averageForNDays(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"]  <- Aux_averageForNDays(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
+	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- Aux_sumForNDays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- differenceBetweenTodayandAux_averageForNDayss (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
 	return (aggregateCasesDataFrame)
 }
 
@@ -222,10 +234,10 @@ aggregateMortalityCases <- function(casesDataFrame,daysToAverage ){
 
 	#add running sum
 	aggregateCasesDataFrame[,"RESULTADO_ACUM"]   <- cumsum(aggregateCasesDataFrame$RESULTADO)
-	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"] <- xDaysAverage(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
-	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- sumxdays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- differenceBetweenTodayandxdaysAverages (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
+	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- Aux_averageForNDays(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"] <- Aux_averageForNDays(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
+	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- Aux_sumForNDays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
+	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- differenceBetweenTodayandAux_averageForNDayss (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
 
 	return (aggregateCasesDataFrame)
 }
