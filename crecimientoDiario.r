@@ -82,7 +82,7 @@ Aux_sumForNDays <- function(averageCasesDataFrame,  days, columnName){
 ##############################################
 # for a specific column calculate the difference between the weekly average of today and the weekly average of last week
 ##############################################
-differenceBetweenTodayandAux_averageForNDayss <- function(averageCasesDataFrame,  days, columnName){
+Aux_setDifferenceBetweenWeeklyAvgandLastWeekAvg <- function(averageCasesDataFrame,  days, columnName){
 	#fill vector with zeroes
 	sums<- rep(0, length(averageCasesDataFrame[,1]))
 	#we are going to calculate starting at days  position, to correctly calculate the average
@@ -221,7 +221,7 @@ aggregateCases <- function(casesDataFrame,daysToAverage ){
 	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- Aux_averageForNDays(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
 	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"]  <- Aux_averageForNDays(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
 	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- Aux_sumForNDays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- differenceBetweenTodayandAux_averageForNDayss (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
+	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- Aux_setDifferenceBetweenWeeklyAvgandLastWeekAvg (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
 	return (aggregateCasesDataFrame)
 }
 
@@ -237,7 +237,7 @@ aggregateMortalityCases <- function(casesDataFrame,daysToAverage ){
 	aggregateCasesDataFrame[,"RESULTADO_average7D"]      <- Aux_averageForNDays(aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
 	aggregateCasesDataFrame[,"RESULTADO_averageACUM7D"] <- Aux_averageForNDays(aggregateCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
 	aggregateCasesDataFrame[,"RESULTADO_SUM7D"]       <- Aux_sumForNDays (aggregateCasesDataFrame, daysToAverage ,"RESULTADO")
-	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- differenceBetweenTodayandAux_averageForNDayss (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
+	aggregateCasesDataFrame[,"RESULTADO_DIFSUM7D"]    <- Aux_setDifferenceBetweenWeeklyAvgandLastWeekAvg (aggregateCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
 
 	return (aggregateCasesDataFrame)
 }
