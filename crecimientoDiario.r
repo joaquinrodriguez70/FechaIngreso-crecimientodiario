@@ -5,6 +5,8 @@
 # 4) CSV file with the  7 days average for new cases and accumulated,
 # 5) Mortality csv
 # 6) Mortality 7 days average Graph
+# 7) R Estimate in CSV
+# 8) Graph for R estimate 
 #  , "","FECHA_INGRESO","RESULTADO","RESULTADO_ACUM","RESULTADO_average7D","RESULTADO_averageACUM7D"
 #R estimate for the above values
 
