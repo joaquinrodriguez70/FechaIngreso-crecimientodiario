@@ -1,7 +1,10 @@
-#Script which calculates the
-#CSV and Plot Generation for confirmed covid cases in Mexico by detection Date (FECHA_INGRESO)
-#  Considering confirmed New cases and accumulated , using an average of x days and cutting off 7 days due of incomplete data
-#  giving a CSV as a result
+#Script that creates covid-19 cases graphs for Mexico, its states and counties by detection Date (FECHA_INGRESO)
+# 1) Graph  for 7 days average for new cases and accumulated, cutting 7 days  due of preliminary data
+# 2) Graph with the epidemic curve
+# 3) Graph with the difference  between the 7 days accumulated cases and the 7 days prior
+# 4) CSV file with the  7 days average for new cases and accumulated,
+# 5) Mortality csv
+# 6) Mortality 7 days average Graph
 #  , "","FECHA_INGRESO","RESULTADO","RESULTADO_ACUM","RESULTADO_average7D","RESULTADO_averageACUM7D"
 #R estimate for the above values
 
