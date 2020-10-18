@@ -199,7 +199,8 @@ generateGraphsForCases <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore,
 #######################################
 
 generateMortalityGraph <-function(dfrConfirmedCases,imovingAverageDays , strProvincename, strFilename) {
-	dfrMortalityCases <- head(aggregateMortalityCases (dfrConfirmedCases,imovingAverageDays ), -(1+imovingAverageDays))
+	#dfrMortalityCases <- head(aggregateMortalityCases (dfrConfirmedCases,imovingAverageDays ), -(1+imovingAverageDays))
+	dfrMortalityCases <- aggregateMortalityCases (dfrConfirmedCases,imovingAverageDays )
 	day_1 <- dfrMortalityCases[1,c("FECHA_DEF")]
 	maxRow <- length(dfrMortalityCases[,c("FECHA_DEF")])
 	maxDate <-dfrMortalityCases[maxRow,c("FECHA_DEF")]
