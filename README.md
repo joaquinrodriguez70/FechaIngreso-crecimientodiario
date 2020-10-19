@@ -28,13 +28,17 @@ Para facilitar su uso, elaboré un script en el lenguaje R que recupera el archi
 En la gráfica anterior es difícil ver las tendencias.
 <br>Para la tendencia semana, se tiene la gráfica siguiente.
 <br>Valores debajo de cero, hay una disminución de casos, valores arriba de cero, hay incremento. 
-<br>Pude encontrar una visualización similar en [Datos de inglaterra del 9 de junio](https://www.cebm.net/covid-19/covid-19-death-data-in-england-update-9th-june) así como en la manera en que se muestran los datos económicos [ejemplo] (https://www.bing.com/images/search?view=detailV2&insightstoken=bcid_SNl.D-iXeu8BtNus2o39ayXgLrJa.....10*ccid_2X8P6Jd6&form=ANCMS1&iss=VSI&selectedindex=4&id=7F0210DC50AE06E158D71D2A13F2243DFB563D2F&ccid=vEjR8CIH&exph=618&expw=1024&vt=2&sim=11&simid=608018527240128967&ck=1ADAA19E4608D02E1FBA0DCB4666FC94&thid=OIP.vEjR8CIHZ0Pnm2GLAkj_RgHaEe&mediaurl=https%3A%2F%2Ffred.stlouisfed.org%2Fgraph%2Ffredgraph.png%3Fid%3DTX42452000M158FRBDAL%26nsh%3D1&pivotparams=insightsToken%3Dccid_i7xvy1VC*cp_F3B41B2EC92049D3B6FFC378D4ABE349*mid_95438FA4E24D8DCA4C0FFC89EBDE22D9AF5F8D43*simid_608051160488545129*thid_OIP.i7xvy1VCiq45cbNHeqqkOgHaEe).
+<br>Pude encontrar una visualización similar en [Datos de inglaterra del 9 de junio](https://www.cebm.net/covid-19/covid-19-death-data-in-england-update-9th-june) así como en la manera en que se muestran los datos económicos.
 	- *Nombre-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
 - Archivo separado por comas (CSV) con los datos de las tres gráficas anteriores
 	- *Nombre-Confirmed-New-cases-Acum-7daysAvg*
+<p align="left">
+  <a href="./img/Mexico-Confirmed-New-cases-Acum-7daysAvg.csv">Casos México</a> 
+</p>
+
 - Archivo CSV con los datos de mortalidad diario y promedio móvil de 7 días.
 	- *Nombre-Mortality.csv*
 - Gráfica con los datos de mortalidad en un promedio móvil de 7 días.
