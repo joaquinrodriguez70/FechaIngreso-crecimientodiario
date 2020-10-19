@@ -9,7 +9,7 @@ Para facilitar su uso, elaboré un script en el lenguaje R que recupera el archi
 ### Se geenran siete archivos, Para el país, cada uno de los estados de México y ciudades principales
 
 - Gráfica con casos acumulados y los nuevos casos. Esta gráfica está inspirada en [Ourworld in data](https://ourworldindata.org/grapher/daily-new-confirmed-cases-of-covid-19-vs-cumulative-cases-positive-rate) y permite ver la evolución de los casos, en el extremo derecho de la curva se puede ver la tendencia actual, ya sea que se de un incremento  o disminución.
-	- Archivo *Nombre-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png*
+	- *Nombre-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
