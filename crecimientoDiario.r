@@ -143,9 +143,9 @@ generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, 
 
 	write.csv(dfrCasesDataFrame,paste(ProvinceTxt,strFilename,".csv", sep=""))
 
-  #EpidemicCurve Name
+	#EpidemicCurve Name
 
-  png(paste(ProvinceTxt, "-Casos",strFilename ,".png", sep=""), width = 1024, height = 768)
+	png(paste(ProvinceTxt, "-Casos",strFilename ,".png", sep=""), width = 1024, height = 768)
 
 	#Create the plot
 	barplot( head(dfrCasesDataFrame$RESULTADO_LAB,-daysToIgnore),
