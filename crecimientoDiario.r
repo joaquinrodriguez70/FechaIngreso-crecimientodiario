@@ -107,7 +107,7 @@ aux_differenceBetweenTodayandaNDaysAverage <- function(averageCasesDataFrame,  d
 #############################################
 generatePlotForAccumulatedandCurrentCases <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, boolsavetoFile,strPathToSave,strFilename,poblacion){
 	campo="FECHA_INGRESO"
-  print(paste("Calculating ->",ProvinceTxt))
+	print(paste("Calculating ->",ProvinceTxt))
 
 	day_1 <- dfrCasesDataFrame[1,c(campo)]
 	maxRow <- length(dfrCasesDataFrame[,c(campo)])
@@ -121,7 +121,7 @@ generatePlotForAccumulatedandCurrentCases <- function(dfrCasesDataFrame , Provin
 
 	# Create the plot
 	plot(x = head(dfrCasesDataFrame$RESULTADO_averageACUM7D,-daysToIgnore),
-	     y = head(dfrCasesDataFrame$RESULTADO_average7D,-daysToIgnore) ,
+		y = head(dfrCasesDataFrame$RESULTADO_average7D,-daysToIgnore) ,
 			 xlab = paste("Acumulados Confirmados averageedio ", daysToIgnore," days"),
 			 ylab="Nuevos",main=paste(ProvinceTxt,day_1,"a",maxDate),
 			 log="xy")
@@ -135,7 +135,7 @@ generatePlotForAccumulatedandCurrentCases <- function(dfrCasesDataFrame , Provin
 #############################################
 generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, boolsavetoFile,strPathToSave,strFilename,poblacion){
 	campo="FECHA_INGRESO"
-  print(paste("Calculating ->",ProvinceTxt))
+	print(paste("Calculating ->",ProvinceTxt))
 
 	day_1 <- dfrCasesDataFrame[1,c(campo)]
 	maxRow <- length(dfrCasesDataFrame[,c(campo)])
@@ -148,8 +148,8 @@ generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, 
   png(paste(ProvinceTxt, "-Casos",strFilename ,".png", sep=""), width = 1024, height = 768)
 
 	#Create the plot
-  barplot( head(dfrCasesDataFrame$RESULTADO_LAB,-daysToIgnore),
-	         names.arg=head(dfrCasesDataFrame[,c(campo)],-daysToIgnore),
+	barplot( head(dfrCasesDataFrame$RESULTADO_LAB,-daysToIgnore),
+					names.arg=head(dfrCasesDataFrame[,c(campo)],-daysToIgnore),
 					 main=paste("Nuevos Ingresos",ProvinceTxt,day_1,"a",maxDate),
 					 las=2,
 					 col ="#0066cc")
@@ -162,7 +162,7 @@ generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, 
 #############################################
 generateWeeklyChangeCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, boolsavetoFile,strPathToSave,strFilename,poblacion){
 	campo="FECHA_INGRESO"
-  print(paste("Calculating ->",ProvinceTxt))
+	print(paste("Calculating ->",ProvinceTxt))
 
 	day_1 <- dfrCasesDataFrame[1,c(campo)]
 	maxRow <- length(dfrCasesDataFrame[,c(campo)])
@@ -209,7 +209,7 @@ generateMortalityGraph <-function(dfrConfirmedCases,imovingAverageDays , strProv
 	png(paste(strFilename,".png",sep=""), width = 1024, height = 768)
 
 	barplot( dfrMortalityCases$RESULTADO_SUM7D,
-	         names.arg=dfrMortalityCases$FECHA_DEF,
+				names.arg=dfrMortalityCases$FECHA_DEF,
 					 main=paste("Mortalidad Suma 7 Dias",strProvincename,day_1,"a",maxDate),
 					 las=2,
 					 col ="#FF9000")
@@ -221,9 +221,9 @@ generateMortalityGraph <-function(dfrConfirmedCases,imovingAverageDays , strProv
 #Generate Weekly Mortality Change Curve
 #############################################
 generateMortalityWeeklyChangeCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, strFilename){
-  dfrMortalityCases <- head(aggregateMortalityCases (dfrCasesDataFrame,daysToAverage ), -(1+daysToAverage))
-  campo="FECHA_DEF"
-  print(paste("Calculating ->",ProvinceTxt))
+	dfrMortalityCases <- head(aggregateMortalityCases (dfrCasesDataFrame,daysToAverage ), -(1+daysToAverage))
+	campo="FECHA_DEF"
+	print(paste("Calculating ->",ProvinceTxt))
 
 	day_1 <- dfrMortalityCases [1,c(campo)]
 	maxRow <- length(dfrMortalityCases [,c(campo)])
@@ -272,14 +272,14 @@ plotRstates <- function(dfrAllR0, boolsavetoFile, strPathToSave){
 
 	# Increase margin size
 	par(mar=c(12,4,4,4))
-  colores = ifelse( dfrAllR0[order(-dfrAllR0$R0),3]  > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
+	colores = ifelse( dfrAllR0[order(-dfrAllR0$R0),3]  > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
 
 	xx <-  barplot(dfrAllR0[order(-dfrAllR0$R0),3], names.arg=dfrAllR0[order(-dfrAllR0$R0),1],main="ValoresR" ,las=2,
-	                col=colores)
+			col=colores)
 
 	## Add text at top of bars
 	text(x = xx, y = dfrAllR0[order(-dfrAllR0$R0),3], label = round(dfrAllR0[order(-dfrAllR0$R0),3], digits=2),
-	     pos = 1, cex = 0.5, col = "red")
+		pos = 1, cex = 0.5, col = "red")
 
  	dev.off()
 
@@ -315,7 +315,7 @@ generateRandPlot<- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysTo
 		png(paste(ProvinceTxt,"-R Estimate", ".png",sep=""), width = 1024, height = 768)
 
 		plot(R_estimate,
-    options_I = list(col ="#0066cc",  ylab = "Incidencia"),
+		options_I = list(col ="#0066cc",  ylab = "Incidencia"),
 		options_R = list( xlab =paste(ProvinceTxt," Del",day_1, "al",latestdayinR0Estimation, "Rt:",latestR0Value ), ylab = "R"))
 
 		dev.off()
@@ -349,7 +349,7 @@ aggregateCases <- function(dfrCasesDataFrame,daysToAverage ){
 aggregateMortalityCases <- function(dfrCasesDataFrame,daysToAverage ){
 
 #set all results to 1 , because we are adding all by FECHA_DEF
-  dfrCasesDataFrame[,"RESULTADO_LAB"] = 1
+	dfrCasesDataFrame[,"RESULTADO_LAB"] = 1
 	dfrCasesDataFrame <- aggregate(formula = RESULTADO_LAB ~ FECHA_DEF , FUN = sum, data = dfrCasesDataFrame)
 
 
