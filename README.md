@@ -29,30 +29,36 @@ En la gráfica anterior es difícil ver las tendencias.
 <br>Para la tendencia semana, se tiene la gráfica siguiente.
 <br>Valores debajo de cero, hay una disminución de casos, valores arriba de cero, hay incremento. 
 <br>Pude encontrar una visualización similar en [Datos de inglaterra del 9 de junio](https://www.cebm.net/covid-19/covid-19-death-data-in-england-update-9th-june) así como en la manera en que se muestran los datos económicos.
-	- *Nombre-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png*
+	- Archivo *Nombre-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
 - Archivo separado por comas (CSV) con los datos de las tres gráficas anteriores
-	- *Nombre-Confirmed-New-cases-Acum-7daysAvg*
-<p align="left">
-  <a href="./img/Mexico-Confirmed-New-cases-Acum-7daysAvg.csv">Casos México</a> 
-</p>
+	- Archivo *Nombre-Confirmed-New-cases-Acum-7daysAvg.csv*
 
 - Archivo CSV con los datos de mortalidad diario y promedio móvil de 7 días.
-	- *Nombre-Mortality.csv*
+	- Archivo *Nombre-Mortality.csv*
+
 - Gráfica con los datos de mortalidad en un promedio móvil de 7 días.
-	- *Nombre-Mortality.png*
+	- Archivo *Nombre-Mortality.png*
+<p align="left">
+  <img src="./img/Mexico-Mortality.png" width="200">
+</p>
 - Archivo CSV con el cálculo de ritmo reproductivo básico.
-	- *Nombre-R Estimate.csv*
+	- Archivo *Nombre-R Estimate.csv*
+
 - Gráfica del ritmo reproductivo básico.
-	- *Nombre-R Estimate*
+	- Archivo *Nombre-R Estimate.png*
 	
 	
 ### Comparativo de estados de México y ciudades principales
 
 - Consolidado de los valores más recientes del ritmo reproductivo básico.
-	
+<br>Se puede comparar los valores más reciente de R(t) de cada estado y zona metropolitana evaluada. El valor de R(t) es un indicador temprano del crecimiento/disminución el cual es muy afectado por la tendencia de la última semana.
+	- Archivo *All-R0.png*	
+<p align="left">
+  <img src="./img/All-R0.png" width="200">
+</p>
 
 ## Librerías
-Se utiliza el paquete [EpiEstim de R] (https://cran.r-project.org/web/packages/EpiEstim/index.html), el cual 
+Se utiliza el paquete [EpiEstim de R] (https://cran.r-project.org/web/packages/EpiEstim/index.html), el cual es el algoritmo más reconocido para el cálculo del valor de R.
