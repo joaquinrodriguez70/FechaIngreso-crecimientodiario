@@ -13,6 +13,7 @@ Para facilitar su uso, elaboré un script en el lenguaje R que recupera el archi
 <p align="left">
   <img src="./img/Mexico-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
+
 - Curva epidémica de casos confirmados.
 	- *Nombre-Casos-Confirmed-New-cases-Acum-7daysAvg.png*
 - Gráfica de promedio móvil de 7 días de casos positivos comparado con la semana anterior, inspirado en [Datos de inglaterra del 9 de junio](https://www.cebm.net/covid-19/covid-19-death-data-in-england-update-9th-june)
