@@ -1,4 +1,4 @@
-# Gráficas de crecimiento diario de covid-19 en México con R.
+## Gráficas de crecimiento diario de covid-19 en México con R.
 Los datos abiertos de covid 19 de México están disponibles en internet de manera diaria en  [Datos Abiertos covid-19  México](http://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip), sin embargo el archivo es más grande que lo que puede manejar Excel, lo que limita su uso.
 
 

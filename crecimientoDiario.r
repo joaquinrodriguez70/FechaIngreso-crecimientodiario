@@ -25,12 +25,15 @@ options(repos = r)
 #library("RCurl")
 #library(ggplot2)
 
-
+#descomentar para Windows Portable
+install.packages("devtools")
+install.packages("EpiEstim")
 library(devtools)
 library(EpiEstim)
 
 
-mydir <-  '/Users/joaquin/Documents/Mios2020/covid/FechaIngreso-crecimientodiario'
+#mydir <-  '/Users/joaquin/Documents/Mios2020/covid/FechaIngreso-crecimientodiario'
+mydir <-  'E:/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario'
 strUrl <-  'http://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip'
 strFilename <- 'datos_abiertos_covid19.zip'
 strConfirmedResult  = 1
