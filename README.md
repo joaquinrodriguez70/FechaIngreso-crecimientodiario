@@ -10,17 +10,11 @@ Para correr el script en windows se puede usar R portable
 * Se instala [R portable](https://portableapps.com/node/32898)
 
 * Se Abre el archivo "crecimientoDiario.r"
-* Se editan las líneas  
-	*#install.packages("devtools")* 
-	
-	*#install.packages("EpiEstim")*
-	
-	Para eliminar el comentario (#) la primera vez que se ejecuta el script
  
 * Se edita la línea *mydir <-  '/Users/joaquin/Documents/Mios2020/covid/FechaIngreso-crecimientodiario'* 
 <br>Para que aplique al directorio donde se encuentre el script, usando / como separador de directorio.
 
-**En Linux y Mac (usnado el paquete de R de la distribución),  solamente se debe instalar una vez a devtools y EpiEstim.**
+**En Linux y Mac (usando el paquete de R de la distribución),  solamente se debe instalar una vez a devtools y EpiEstim.**
 
 ## Archivos generados 
 
@@ -78,6 +72,9 @@ En la gráfica anterior es difícil ver las tendencias.
 </p>
 2. Reporte de los valores más recientes del ritmo reproductivo básico.
 	- Archivo *All-R0.csv*
-	
+
+## Tablero de PowerBI.
+En el directorio "Tablero" se tiene un archivo que toma la información local de México y lo muestra de manera gráfica interactiva.
+
 ## Librerías
 Se utiliza el paquete [EpiEstim de R] (https://cran.r-project.org/web/packages/EpiEstim/index.html), el cual es el algoritmo más reconocido para el cálculo del valor de R.
