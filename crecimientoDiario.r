@@ -147,7 +147,7 @@ generatePlotForAccumulatedandCurrentCases <- function(dfrCasesDataFrame , Provin
 generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, boolsavetoFile,strPathToSave,strFilename,poblacion){
 	campo="FECHA_INGRESO"
 	print(paste("Calculating ->",ProvinceTxt))
-
+  dfrCasesDataFrame[,"POB"] <- poblacion
 	day_1 <- dfrCasesDataFrame[1,c(campo)]
 	maxRow <- length(dfrCasesDataFrame[,c(campo)])
 	maxDate <-dfrCasesDataFrame[maxRow-daysToIgnore,c(campo)]
@@ -166,6 +166,18 @@ generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, 
 					 col ="#0066cc")
 
 	dev.off()
+	if (poblacion > 0) {
+		png(paste(ProvinceTxt, "-CasosX100k",strFilename ,".png", sep=""), width = 1024, height = 768)
+
+		#Create the plot
+		barplot( head(dfrCasesDataFrame$RESULTADO_LAB/poblacion,-daysToIgnore),
+						names.arg=head(dfrCasesDataFrame[,c(campo)],-daysToIgnore),
+						 main=paste("Nuevos Ingresos por 100k",ProvinceTxt,day_1,"a",maxDate),
+						 las=2,
+						 col ="#0066cc")
+
+		dev.off()
+	}
 }
 
 #############################################
@@ -299,7 +311,7 @@ plotRstates <- function(dfrAllR0, boolsavetoFile, strPathToSave){
 #############################################
 #Calculate R Estimation and Plot
 #############################################
-generateRandPlot<- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, boolsavetoFile,strPathToSave,strFilename,poblacion){
+generateRandPlot<- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, boolsavetoFile,strPathToSave,strFilename){
 
 
 		#######################
@@ -393,19 +405,24 @@ if (TRUE) {
 #fill state names
 vecListaEstados <- c(1:32)
 vecnombreEstados <-c ("AGUASCALIENTES","BAJA_CALIFORNIA","BAJA_CALIFORNIA_SUR","CAMPECHE",	"COAHUILA",	"COLIMA","CHIAPAS",	"CHIHUAHUA","CDMX",	"DURANGO","GUANAJUATO",	"GUERRERO",	"HIDALGO","JALISCO","ESTADO_DE_MEXICO","MICHOACAN","MORELOS","NAYARIT","NUEVO_LEON","OAXACA","PUEBLA","QUERETARO","QUINTANA_ROO","SAN_LUIS_POTOSI","SINALOA","SONORA","TABASCO","TAMAULIPAS","TLAXCALA","VERACRUZ","YUCATAN","ZACATECAS")
-vecpoblacionEstados <-c(1184996,3155070,637026,822441,2748391,650555,4796580,3406465,8851080,1632934,5486372,3388768,2665018,7350682,15175862,4351037,1777227,1084979,4653458,3801962,5779829,1827937,1325578,2585518,2767761,2662480,2238603,3268554,1169936,7643194,1955577,1490668)
+
+setwd(mydir)
+strPathToSave<- paste(mydir,"/pob",sep="")
+setwd(strPathToSave)
+dfrProblacion <- read.csv("pobmunMX2020.csv")
+setwd(mydir)
 
 #######################################
 #countrycases
 #######################################
 #Keep only confirmed case
-
+poblacion <- sum(dfrProblacion [,c('poblacion')]) / 100000
 dfrConfirmedCases <- dfrConfirmedCases [ dfrConfirmedCases$RESULTADO_LAB == strConfirmedResult,c("FECHA_INGRESO","RESULTADO_LAB","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF")]
 dfrMortalityCases <- dfrConfirmedCases [ dfrConfirmedCases$FECHA_DEF != notDead,c("FECHA_INGRESO","RESULTADO_LAB","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrConfirmedCases,imovingAverageDays )
-generateGraphsForCases    (dfrConfirmedCaseswithAgregations , "Mexico", idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",130000000)
+generateGraphsForCases    (dfrConfirmedCaseswithAgregations , "Mexico", idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",poblacion)
 
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations , "Mexico", idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",130000000)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations , "Mexico", idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 
@@ -414,13 +431,14 @@ generateGraphsForMortality (dfrMortalityCases,imovingAverageDays , "Mexico", pas
 #######################################
 #statewide
 #######################################
+poblacion <-0
 for (i in 1:length(vecListaEstados)) {
 
 #Arguments: dataframe with country wide cases, state number, state name	, cut-off days, cases' number of days to average  , boolsavetoFile, strPath
   dfrCasesByState <- dfrConfirmedCases [ dfrConfirmedCases$RESULTADO_LAB==strConfirmedResult & dfrConfirmedCases$ENTIDAD_RES == i, c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
   dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrCasesByState,imovingAverageDays )
-	generateGraphsForCases    (dfrConfirmedCaseswithAgregations, vecnombreEstados[[i]],idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg", vecpoblacionEstados[[i]])
-	dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations, vecnombreEstados[[i]],idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg", vecpoblacionEstados[[i]])
+	generateGraphsForCases    (dfrConfirmedCaseswithAgregations, vecnombreEstados[[i]],idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg", poblacion)
+	dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations, vecnombreEstados[[i]],idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 	dfrAllR0<-rbind(dfrAllR0,dfrR0)
 	generateGraphsForMortality (dfrCasesByState,imovingAverageDays , vecnombreEstados[[i]], paste(vecnombreEstados[[i]],"-Mortality",sep=""))
@@ -441,7 +459,7 @@ numeroEstados<-c(1)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -457,7 +475,7 @@ numeroEstados<-c(2)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -472,7 +490,7 @@ numeroEstados<-c(2)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -488,7 +506,7 @@ numeroEstados<-c(3)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -502,7 +520,7 @@ numeroEstados<-c(3)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 #generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 #generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -516,7 +534,7 @@ numeroEstados<-c(6)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -530,7 +548,7 @@ numeroEstados<-c(7)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -545,7 +563,7 @@ numeroEstados<-c(8)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -561,7 +579,7 @@ numeroEstados<-c(11)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -577,7 +595,7 @@ numeroEstados<-c(12)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -594,7 +612,7 @@ numeroEstados<-c(13)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -610,7 +628,7 @@ numeroEstados<-c(14)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -624,7 +642,7 @@ numeroEstados<-c(14)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -639,7 +657,7 @@ numeroEstados<-c(15,9)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -655,7 +673,7 @@ numeroEstados<-c(16)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -669,7 +687,7 @@ numeroEstados<-c(16)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -683,7 +701,7 @@ numeroEstados<-c(16)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -698,7 +716,7 @@ numeroEstados<-c(18)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -713,7 +731,7 @@ numeroEstados<-c(19)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -729,7 +747,7 @@ numeroEstados<-c(20)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -746,7 +764,7 @@ numeroEstados<-c(21)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -761,7 +779,7 @@ numeroEstados<-c(23)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -776,7 +794,7 @@ numeroEstados<-c(25)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -790,7 +808,7 @@ numeroEstados<-c(25)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -805,7 +823,7 @@ numeroEstados<-c(26)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -820,7 +838,7 @@ numeroEstados<-c(27)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -834,7 +852,7 @@ numeroEstados<-c(30)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -849,7 +867,7 @@ numeroEstados<-c(31)
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
@@ -878,7 +896,7 @@ nombreMunicipios <-"ZM_LA LAGUNA"
 dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
 generateGraphsForCases (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",0)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""))
