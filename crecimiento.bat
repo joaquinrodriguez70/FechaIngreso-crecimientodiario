@@ -1,0 +1,1 @@
+PS E:\misdoc\Mios2020\covid19\FechaIngreso-crecimientodiario> E:\install\rportable\R-Portable\3.6\App\R-Portable\bin\x64\Rscript.exe  E:/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario/crecimientoDiario.r
