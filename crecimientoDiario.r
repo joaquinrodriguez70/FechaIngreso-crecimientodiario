@@ -48,6 +48,7 @@ strConfirmedResult  = 1
 idaysForGraphToCutOff = 7
 imovingAverageDays = 7
 notDead = '9999-99-99'
+dfrAllCases = data.frame(stringsAsFactors = FALSE)
 dfrAllR0 = data.frame(stringsAsFactors = FALSE)
 
 ##############################################
