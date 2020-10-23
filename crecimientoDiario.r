@@ -969,5 +969,4 @@ strPathToSave<- paste(mydir,"/img",sep="")
 plotRstates(dfrAllR0, boolsavetoFile, strPathToSave)
 
 setwd(strPathToSave)
-
 write.csv(dfrAllCases, paste("AllCases-MX",".csv",sep=""))
