@@ -18,7 +18,7 @@ Para correr el script en windows se puede usar R portable
 
 ## Archivos generados 
 
-### Para el país, cada uno de los estados de México y ciudades principales se generan ocho archivos:
+### Para el país, cada uno de los estados de México y ciudades principales se generan nueve archivos:
 
 1. Gráfica con casos acumulados y los nuevos casos. 
 <br>Esta gráfica está inspirada en [Ourworld in data](https://ourworldindata.org/grapher/daily-new-confirmed-cases-of-covid-19-vs-cumulative-cases-positive-rate) y permite ver claramente la tendencia actual, ya sea que se de un incremento  o disminución.
@@ -60,6 +60,15 @@ En la gráfica anterior es difícil ver las tendencias.
 
 8. Gráfica del ritmo reproductivo básico.
 	- Archivo *Nombre-R Estimate.png*
+<p align="left">
+  <img src="./img/Mexico-R Estimate.png" width="200">
+</p>	
+	
+9. Gráfica de los casos por 100 mil habitantes por cada entidad o municipio.
+	- Archivo -*Nombre-CasosX100k-Confirmed-New-cases-Acum-7daysAvg*
+<p align="left">
+  <img src="./img/Mexico-CasosX100k-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
+</p>	
 	
 	
 ### Comparativo de estados de México y ciudades principales
