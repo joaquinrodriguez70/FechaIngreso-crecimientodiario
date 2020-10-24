@@ -175,7 +175,7 @@ generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, 
 						names.arg=head(dfrCasesDataFrame[,c(campo)],-daysToIgnore),
 						 main=paste("Nuevos Casos Semanal por 100k",ProvinceTxt,day_1,"a",maxDate),
 						 las=2,
-						 ylim=c(0,160),
+						 ylim=c(0,180),
 						 col ="#0066cc")
 
 		dev.off()
