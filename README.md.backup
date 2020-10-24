@@ -60,6 +60,15 @@ En la gráfica anterior es difícil ver las tendencias.
 
 8. Gráfica del ritmo reproductivo básico.
 	- Archivo *Nombre-R Estimate.png*
+<p align="left">
+  <img src="./img/Mexico-R Estimate.png" width="200">
+</p>	
+	
+9. Gráfica de los casos por 100 mil habitantes por cada entidad o municipio.
+	- Archivo -*Nombre-CasosX100k-Confirmed-New-cases-Acum-7daysAvg*
+<p align="left">
+  <img src="./img/Mexico-CasosX100k-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
+</p>	
 	
 	
 ### Comparativo de estados de México y ciudades principales
@@ -74,6 +83,7 @@ En la gráfica anterior es difícil ver las tendencias.
 	- Archivo *All-R0.csv*
 
 ## Tablero de PowerBI.
-En el directorio "Tablero" se tiene un arch
+En el directorio "Tablero" se tiene un archivo que toma la información local de México y lo muestra de manera gráfica interactiva.
+
 ## Librerías
 Se utiliza el paquete [EpiEstim de R] (https://cran.r-project.org/web/packages/EpiEstim/index.html), el cual es el algoritmo más reconocido para el cálculo del valor de R.
