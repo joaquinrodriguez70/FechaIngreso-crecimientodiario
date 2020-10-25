@@ -36,11 +36,9 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 </p>
 
 4. Archivo separado por comas (CSV) con los datos de las tres gráficas anteriores
-<br>
 	- Archivo *Nombre-Confirmed-New-cases-Acum-7daysAvg.csv*
-
+	
 5. Archivo CSV con los datos de mortalidad diario y promedio móvil de 7 días (velocidad).
-<br>
 	- Archivo *Nombre-Mortality.csv*
 
 6. Gráfica con los datos de mortalidad en un promedio móvil de 7 días.
