@@ -206,6 +206,17 @@ generateWeeklyChangeCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgno
 					 col = colores)
 
 	dev.off()
+	png(paste(ProvinceTxt, "-CasosVsSemAnt Accel",strFilename ,".png", sep=""), width = 1024, height = 768)
+
+	#Create the plot
+	colores = ifelse( head(dfrCasesDataFrame$RESULTADO_SUM7DACCEL,-daysToIgnore) > 1 ,rgb(0.2,0.4,0.6,0.6), "#69b3a2")
+	barplot( head(dfrCasesDataFrame$RESULTADO_SUM7DACCEL,-daysToIgnore),
+					 names.arg=head(dfrCasesDataFrame[, c(campo)],-daysToIgnore),
+					 main=paste("Aceleracion casos esta semana vs semana anterior",ProvinceTxt,day_1,"a",maxDate),
+					 las=2,
+					 col = colores)
+
+	dev.off()
 
 }
 #############################################
@@ -379,6 +390,8 @@ aggregateCases <- function(dfrCasesDataFrame,daysToAverage ){
 	dfrCasesDataFrame[,"RESULTADO_averageACUM7D"]  <- aux_averageforNDays(dfrCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
 	dfrCasesDataFrame[,"RESULTADO_SUM7D"]          <- aux_sumForNDays (dfrCasesDataFrame, daysToAverage ,"RESULTADO_LAB")
 	dfrCasesDataFrame[,"RESULTADO_DIFSUM7D"]       <- aux_differenceBetweenTodayandaNDaysAverage (dfrCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
+	dfrCasesDataFrame[,"RESULTADO_SUM7DACCEL"]     <- aux_differenceBetweenTodayandaNDaysAverage (dfrCasesDataFrame, daysToAverage ,"RESULTADO_DIFSUM7D")
+
 	return (dfrCasesDataFrame)
 }
 
@@ -398,6 +411,7 @@ aggregateMortalityCases <- function(dfrCasesDataFrame,daysToAverage ){
 	dfrCasesDataFrame[,"RESULTADO_averageACUM7D"]  <- aux_averageforNDays(dfrCasesDataFrame, daysToAverage ,"RESULTADO_ACUM")
 	dfrCasesDataFrame[,"RESULTADO_SUM7D"]          <- aux_sumForNDays (dfrCasesDataFrame, daysToAverage ,"RESULTADO_LAB")
 	dfrCasesDataFrame[,"RESULTADO_DIFSUM7D"]       <- aux_differenceBetweenTodayandaNDaysAverage (dfrCasesDataFrame, daysToAverage ,"RESULTADO_SUM7D")
+	dfrCasesDataFrame[,"RESULTADO_SUM7DACCEL"]     <- aux_differenceBetweenTodayandaNDaysAverage (dfrCasesDataFrame, daysToAverage ,"RESULTADO_DIFSUM7D")
 
 	return (dfrCasesDataFrame)
 }
