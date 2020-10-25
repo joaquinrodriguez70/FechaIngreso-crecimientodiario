@@ -39,7 +39,6 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 	- Archivo *Nombre-Confirmed-New-cases-Acum-7daysAvg.csv*
 	
 5. Archivo CSV con los datos de mortalidad diario y promedio móvil de 7 días (velocidad).
-
 	- Archivo *Nombre-Mortality.csv*
 
 6. Gráfica con los datos de mortalidad en un promedio móvil de 7 días.
@@ -53,7 +52,7 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 	- Archivo *Nombre-R Estimate.csv*
 
 8. Gráfica del ritmo reproductivo básico.
-<br>Se calcula con el paquete EpiEstim, tiene tres gráficas, la curva epidémica, el valor de R a lo largo del tiempo, valores mayores de uno, hay un crecimiento y menor de uno, indica un decrecimiento, El valor de R es muy sensible a los cambios en la semana anterior, por lo que se debe comparar con las demás gráficas.
+<br>Se calcula con el paquete EpiEstim, el cual es el más reconocido para el cálculo de este indicador. La imagen tiene tres gráficas, la curva epidémica, el valor de R a lo largo del tiempo, valores mayores de uno, hay un crecimiento y menor de uno, indica un decrecimiento, El valor de R es muy sensible a los cambios en la semana anterior, por lo que se debe comparar con las demás gráficas.
 	- Archivo *Nombre-R Estimate.png*
 <p align="left">
   <img src="./img/Mexico-R Estimate.png" width="200">
@@ -67,7 +66,7 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 </p>
 
 10. Gráfica de la aceleracion de  casos (diferencia de velocidad en una semana).
-<br>La aceleración es el cambio de velocidad de los casos de la semana, la aceleración combinada con el número de casos existentes  puede indicar que tan grave es la peidemia en un momento dado.
+<br>La aceleración es el cambio de velocidad de los casos de la semana, la aceleración combinada con el número de casos existentes  puede indicar que tan grave es la epidemia en un momento dado.
 	- Archivo *Nombre-CasosVsSemAnt Accel-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-CasosVsSemAnt Accel-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
