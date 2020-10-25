@@ -85,6 +85,8 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 2. Reporte de los valores más recientes del ritmo reproductivo básico.
 	- Archivo *All-R0.csv*
 
+<p align="left">
+  <img src="./img/https://github.com/joaquinrodriguez70/FechaIngreso-crecimientodiario/tree/master/img
 
 ## Tablero de PowerBI.
 En el directorio "Tablero" se tiene un archivo que toma la información local de México y lo muestra de manera gráfica interactiva.

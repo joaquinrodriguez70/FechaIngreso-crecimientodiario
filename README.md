@@ -85,6 +85,8 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 2. Reporte de los valores más recientes del ritmo reproductivo básico.
 	- Archivo *All-R0.csv*
 
+Todas las gráficas se pueden ver en:
+<a href="./img"> Liga de imágenes </a>
 
 ## Tablero de PowerBI.
 En el directorio "Tablero" se tiene un archivo que toma la información local de México y lo muestra de manera gráfica interactiva.
