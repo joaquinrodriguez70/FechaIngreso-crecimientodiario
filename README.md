@@ -8,11 +8,11 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 
 ## Archivos generados
 
-### Para el país, cada uno de los estados de México y ciudades principales se generan nueve archivos:
+### Para el país, cada uno de los estados de México y ciudades principales se generan diez archivos:
 
 1. Gráfica con casos acumulados y los nuevos casos.
 <br>Esta gráfica está inspirada en [Ourworld in data](https://ourworldindata.org/grapher/daily-new-confirmed-cases-of-covid-19-vs-cumulative-cases-positive-rate).
-<br>En esta grñafica se amplifica las medidas de cambio semanal, se muestra si hay tendencias de crecimiento o disminución así como se puede ver los máximos y mínimos a lo largo del tiempo.  
+<br>En esta gráfica se muestra el cambio semanal de manera rápida, se muestra si hay tendencias de crecimiento o disminución así como se puede ver los máximos y mínimos a lo largo del tiempo.  
 	- Archivo *Nombre-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
@@ -26,10 +26,9 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
   <img src="./img/Mexico-Casos-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
 
-3. Gráfica de promedio móvil de 7 días de casos positivos comparado con la semana anterior (velocidad de cambio semanal). <br>
-En la gráfica anterior es difícil ver las tendencias.
-<br>Muestra la velocidad que tiene la epidemia, se calcula diariamente, con los datos de la semana anterior.
-<br>Valores debajo de cero, hay una disminución de casos, valores arriba de cero, hay incremento.
+3. Gráfica de la velocidad de la epidemia semanal (promedio móvil de 7 días de casos positivos comparado con la semana anterior).
+<br>La velocidad se calcula diariamente, tomadno el acumulado de la semana anterior.
+<br>Cuando en la gráfica se ven valores debajo de cero, hay una disminución de casos, valores arriba de cero, hay incremento.
 <br>Pude encontrar una visualización similar en [Datos de inglaterra del 9 de junio](https://www.cebm.net/covid-19/covid-19-death-data-in-england-update-9th-june) así como en la manera en que se muestran los datos económicos.
 	- Archivo *Nombre-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
