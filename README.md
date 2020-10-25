@@ -34,10 +34,13 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 <p align="left">
   <img src="./img/Mexico-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
+
 4. Archivo separado por comas (CSV) con los datos de las tres gráficas anteriores
+<br>
 	- Archivo *Nombre-Confirmed-New-cases-Acum-7daysAvg.csv*
 
-5. Archivo CSV con los datos de mortalidad diario y promedio móvil de 7 días.
+5. Archivo CSV con los datos de mortalidad diario y promedio móvil de 7 días (velocidad).
+<br>
 	- Archivo *Nombre-Mortality.csv*
 
 6. Gráfica con los datos de mortalidad en un promedio móvil de 7 días.
@@ -46,6 +49,7 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 <p align="left">
   <img src="./img/Mexico-Mortality.png" width="200">
 </p>
+
 7. Archivo CSV con el cálculo de ritmo reproductivo básico.
 	- Archivo *Nombre-R Estimate.csv*
 
@@ -79,6 +83,7 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 <p align="left">
   <img src="./img/All-R0.png" width="200">
 </p>
+
 2. Reporte de los valores más recientes del ritmo reproductivo básico.
 	- Archivo *All-R0.csv*
 

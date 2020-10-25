@@ -27,17 +27,19 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 </p>
 
 3. Gráfica de la velocidad de la epidemia semanal (promedio móvil de 7 días de casos positivos comparado con la semana anterior).
-<br>Muestra la velocidad que tiene la epidemia, se calcula diariamente, con los datos de la semana anterior.
-<br>Valores debajo de cero, hay una disminución de casos, valores arriba de cero, hay incremento.
+<br>La velocidad se calcula diariamente, tomadno el acumulado de la semana anterior.
+<br>Cuando en la gráfica se ven valores debajo de cero, hay una disminución de casos, valores arriba de cero, hay incremento.
 <br>Pude encontrar una visualización similar en [Datos de inglaterra del 9 de junio](https://www.cebm.net/covid-19/covid-19-death-data-in-england-update-9th-june) así como en la manera en que se muestran los datos económicos.
 	- Archivo *Nombre-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
 4. Archivo separado por comas (CSV) con los datos de las tres gráficas anteriores
+<br>
 	- Archivo *Nombre-Confirmed-New-cases-Acum-7daysAvg.csv*
 
-5. Archivo CSV con los datos de mortalidad diario y promedio móvil de 7 días.
+5. Archivo CSV con los datos de mortalidad diario y promedio móvil de 7 días (velocidad).
+<br>
 	- Archivo *Nombre-Mortality.csv*
 
 6. Gráfica con los datos de mortalidad en un promedio móvil de 7 días.
