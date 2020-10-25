@@ -1,15 +1,18 @@
 # Gráficas de crecimiento diario de covid-19 en México con R.
-Los datos abiertos de covid 19 de México están disponibles en internet de manera diaria en  [Datos Abiertos covid-19  México](http://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip), sin embargo el archivo es más grande que lo que puede manejar Excel, lo que limita su uso.
+Los datos abiertos de covid 19 de México están disponibles en internet de manera diaria en  [Datos Abiertos covid-19  México](http://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip),desafortunadamente el archivo es tan grande que es imposible manejarlo con Excel, lo que limita su uso.
 
+Para sobrepasar este impedimento, elaboré un script en el lenguaje R que sumariza los datos y  genera gráficas y archivos csv por estado y por ciudad.
 
-Para facilitar su uso, elaboré un script en el lenguaje R que recupera el archivo diario de casos y genera gráficas y archivos csv con sumarizados, además calcula los valores del [Ritmo reproductivo básico] (https://es.wikipedia.org/wiki/Ritmo_reproductivo_b%C3%A1sico) para México, los estados y zonas metropolitanas seleccionadas de México
+También se calculan los valores del [Ritmo reproductivo básico] (https://es.wikipedia.org/wiki/Ritmo_reproductivo_b%C3%A1sico) para México, los estados y zonas metropolitanas.
+
 
 ## Archivos generados
 
 ### Para el país, cada uno de los estados de México y ciudades principales se generan nueve archivos:
 
 1. Gráfica con casos acumulados y los nuevos casos.
-<br>Esta gráfica está inspirada en [Ourworld in data](https://ourworldindata.org/grapher/daily-new-confirmed-cases-of-covid-19-vs-cumulative-cases-positive-rate) y permite ver claramente la tendencia actual, ya sea que se de un incremento  o disminución.
+<br>Esta gráfica está inspirada en [Ourworld in data](https://ourworldindata.org/grapher/daily-new-confirmed-cases-of-covid-19-vs-cumulative-cases-positive-rate).
+<br>En esta grñafica se amplifica las medidas de cambio semanal, se muestra si hay tendencias de crecimiento o disminución así como se puede ver los máximos y mínimos a lo largo del tiempo.  
 	- Archivo *Nombre-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
@@ -17,15 +20,15 @@ Para facilitar su uso, elaboré un script en el lenguaje R que recupera el archi
 
 2. Curva epidémica de casos confirmados.
 <br>Es la curva clásica para ver la evolución de la pandemia.
-<br>En esta curva se ve que los fines de semana y asuetos hay menos casos que durante la semana regular.
+<br>Esta curva es diaria donde se ve el hecho de que los fines de semana y asuetos hay menos casos que durante la semana. Esta curva permita ver el cambio de manera precisa, pero es mejor usar las curvas semanales para observar las tendencias.
 	- Archivo *Nombre-Casos-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-Casos-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
 
-3. Gráfica de promedio móvil de 7 días de casos positivos comparado con la semana anterior. <br>
+3. Gráfica de promedio móvil de 7 días de casos positivos comparado con la semana anterior (velocidad de cambio semanal). <br>
 En la gráfica anterior es difícil ver las tendencias.
-<br>Para la tendencia semana, se tiene la gráfica siguiente.
+<br>Muestra la velocidad que tiene la epidemia, se calcula diariamente, con los datos de la semana anterior.
 <br>Valores debajo de cero, hay una disminución de casos, valores arriba de cero, hay incremento.
 <br>Pude encontrar una visualización similar en [Datos de inglaterra del 9 de junio](https://www.cebm.net/covid-19/covid-19-death-data-in-england-update-9th-june) así como en la manera en que se muestran los datos económicos.
 	- Archivo *Nombre-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png*
@@ -39,6 +42,7 @@ En la gráfica anterior es difícil ver las tendencias.
 	- Archivo *Nombre-Mortality.csv*
 
 6. Gráfica con los datos de mortalidad en un promedio móvil de 7 días.
+<br>Muestra la velocidad de la mortalidad de la epidemia, se calcula diariamente, con los datos de la semana anterior.
 	- Archivo *Nombre-Mortality.png*
 <p align="left">
   <img src="./img/Mexico-Mortality.png" width="200">
@@ -47,18 +51,21 @@ En la gráfica anterior es difícil ver las tendencias.
 	- Archivo *Nombre-R Estimate.csv*
 
 8. Gráfica del ritmo reproductivo básico.
+<br>Se calcula con el paquete EpiEstim, tiene tres gráficas, la curva epidémica, el valor de R a lo largo del tiempo, valores mayores de uno, hay un crecimiento y menor de uno, indica un decrecimiento, El valor de R es muy sensible a los cambios en la semana anterior, por lo que se debe comparar con las demás gráficas.
 	- Archivo *Nombre-R Estimate.png*
 <p align="left">
   <img src="./img/Mexico-R Estimate.png" width="200">
 </p>
 
 9. Gráfica de los casos por 100 mil habitantes por cada entidad o municipio.
+<br>Esta gráfica permite comparar la epidemia en los estados y ciduades bajo el mismo parámetro.
 	- Archivo *Nombre-CasosX100k-Confirmed-New-cases-Acum-7daysAvg*
 <p align="left">
   <img src="./img/Mexico-CasosX100k-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
 </p>
 
 10. Gráfica de la aceleracion de  casos (diferencia de velocidad en una semana).
+<br>La aceleración es el cambio de velocidad de los casos de la semana, la aceleración combinada con el número de casos existentes  puede indicar que tan grave es la peidemia en un momento dado.
 	- Archivo *Nombre-CasosVsSemAnt Accel-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
   <img src="./img/Mexico-CasosVsSemAnt Accel-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
