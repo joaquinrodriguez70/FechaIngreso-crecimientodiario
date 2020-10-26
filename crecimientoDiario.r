@@ -50,7 +50,7 @@ imovingAverageDays = 7
 notDead = '9999-99-99'
 dfrAllCases = data.frame(stringsAsFactors = FALSE)
 dfrAllR0 = data.frame(stringsAsFactors = FALSE)
-
+dfrAllMortalityCases = data.frame(stringAsFactors=FALSE)
 ##############################################
 # for a specific column  calculates the average of the last x days
 ##############################################
@@ -237,7 +237,7 @@ generateGraphsForCases <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore,
 #generateMortalityGraph (like Epidemic Curve)
 #######################################
 
-generateMortalityGraph <-function(dfrConfirmedCases,imovingAverageDays , strProvincename, strFilename,poblacion) {
+generateMortalityGraph <-function(dfrConfirmedCases,imovingAverageDays , ProvinceTxt, strFilename,poblacion) {
 	#dfrMortalityCases <- head(aggregateMortalityCases (dfrConfirmedCases,imovingAverageDays ), -(1+imovingAverageDays))
 	dfrMortalityCases <- aggregateMortalityCases (dfrConfirmedCases,imovingAverageDays )
 	dfrMortalityCases[,"POB"] <- poblacion
@@ -250,7 +250,7 @@ generateMortalityGraph <-function(dfrConfirmedCases,imovingAverageDays , strProv
 
 	barplot( dfrMortalityCases$RESULTADO_SUM7D,
 				names.arg=dfrMortalityCases$FECHA_DEF,
-					 main=paste("Mortalidad Suma 7 Dias",strProvincename,day_1,"a",maxDate),
+					 main=paste("Mortalidad Suma 7 Dias",ProvinceTxt,day_1,"a",maxDate),
 					 las=2,
 					 col ="#FF9000")
 	dev.off()
@@ -259,11 +259,13 @@ generateMortalityGraph <-function(dfrConfirmedCases,imovingAverageDays , strProv
 
 	barplot( dfrMortalityCases$RESULTADO_SUM7D/poblacion,
 				names.arg=dfrMortalityCases$FECHA_DEF,
-					 main=paste("Mortalidad Suma 7 Dias por 100k",strProvincename,day_1,"a",maxDate),
+					 main=paste("Mortalidad Suma 7 Dias por 100k",ProvinceTxt,day_1,"a",maxDate),
 					 las=2,
 					 ylim=c(0,20),
 					 col ="#FF9000")
 	dev.off()
+	dfrMortalityCases[,"ENTIDAD"] = ProvinceTxt
+	return(dfrMortalityCases)
 }
 
 
@@ -299,11 +301,11 @@ generateMortalityWeeklyChangeCurve <- function(dfrCasesDataFrame , ProvinceTxt,d
 #############################################
 #Generate Mortality Graphs
 #############################################
-generateGraphsForMortality <-function(dfrConfirmedCases,imovingAverageDays ,strProvincename, strFilename,poblacion) {
-	generateMortalityGraph  (dfrConfirmedCases,imovingAverageDays , strProvincename, strFilename,poblacion)
+generateGraphsForMortality <-function(dfrConfirmedCases,imovingAverageDays ,ProvinceTxt, strFilename,poblacion) {
+	dfrMortalityCases <- generateMortalityGraph  (dfrConfirmedCases,imovingAverageDays , ProvinceTxt, strFilename,poblacion)
 	#next is not very meningful
-	#generateMortalityWeeklyChangeCurve (dfrConfirmedCases , strProvincename ,imovingAverageDays, imovingAverageDays,strFilename)
-
+	#generateMortalityWeeklyChangeCurve (dfrConfirmedCases , ProvinceTxt ,imovingAverageDays, imovingAverageDays,strFilename)
+  return(dfrMortalityCases)
 }
 
 
@@ -456,8 +458,8 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations , "Mexico", idaysFor
 dfrAllCases <- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 
-generateGraphsForMortality (dfrMortalityCases,imovingAverageDays , "Mexico", paste("Mexico","-Mortality",sep=""),poblacion)
-
+dfrMortalityCases <-generateGraphsForMortality (dfrMortalityCases,imovingAverageDays , "Mexico", paste("Mexico","-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 #######################################
 #statewide
 #######################################
@@ -473,8 +475,9 @@ for (i in 1:length(vecListaEstados)) {
 
 	dfrAllCases<- rbind(dfrAllCases,dfrCases)
 	dfrAllR0<-rbind(dfrAllR0,dfrR0)
-	generateGraphsForMortality (dfrCasesByState,imovingAverageDays , vecnombreEstados[[i]], paste(vecnombreEstados[[i]],"-Mortality",sep=""),poblacion)
 
+	dfrMortalityCases <- generateGraphsForMortality (dfrCasesByState,imovingAverageDays , vecnombreEstados[[i]], paste(vecnombreEstados[[i]],"-Mortality",sep=""),poblacion)
+  dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 }
 
 
@@ -496,8 +499,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 2
 
@@ -513,8 +517,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 
 nombreMunicipios <-"ZM_MEXICALI"
@@ -529,8 +534,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 3
 
@@ -547,8 +553,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 nombreMunicipios <-c ("ZM_LORETO")
 numeroMunicipios <-c (9)
@@ -562,7 +569,7 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-#generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+#dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
 ##################################### 7
 nombreMunicipios <-"ZM_COLIMA"
@@ -578,7 +585,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 7
 nombreMunicipios <-"ZM_TUXTLA_GUTIERREZ"
@@ -594,8 +603,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 8
 nombreMunicipios <-"ZM_CD_JUAREZ"
@@ -611,8 +621,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 11
 
@@ -629,8 +640,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 ##################################### 12
 #acapulco
 
@@ -647,8 +659,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 13
 #
@@ -666,8 +679,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 14
 #guadalajara
@@ -684,7 +698,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 #guadalajara
 nombreMunicipios <-"ZM_PUERTO_VALLARTA"
@@ -700,8 +716,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 15
 nombreMunicipios <-"ZM_CDMX"
@@ -717,8 +734,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 16
 
@@ -735,8 +753,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 nombreMunicipios <-"ZM_LAZARO_CARDENAS"
 numeroMunicipios <-c (52)
@@ -751,8 +770,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 nombreMunicipios <-"ZM_URUAPAN"
 numeroMunicipios <-c (102)
@@ -766,8 +786,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ################################## 18
 nombreMunicipios <-"ZM_TEPIC"
@@ -783,8 +804,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 19
 nombreMunicipios <-"ZM_MONTERREY"
@@ -800,8 +822,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 20
 
@@ -818,8 +841,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
-poblacion <-sum (dfrPoblacion[dfrPoblacion$estado %in% numeroEstados & dfrPoblacion$municipio %in% numeroMunicipios  , c("poblacion")]) /100000
+
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 
 
@@ -838,8 +862,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 23
 nombreMunicipios <-"ZM_CANCUN"
@@ -855,8 +880,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 25
 nombreMunicipios <-"ZM_CULIACAN"
@@ -872,8 +898,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 nombreMunicipios <-"ZM_MAZATLAN"
 numeroMunicipios <-c (12)
@@ -888,8 +915,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 26
 nombreMunicipios <-"ZM_HERMOSILLO"
@@ -905,8 +933,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ######################### 27
 nombreMunicipios <-"ZM_VILLAHERMOSA"
@@ -922,7 +951,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 30
 nombreMunicipios <-"ZM_VERACRUZ"
@@ -938,8 +969,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 ##################################### 31
 nombreMunicipios <-"ZM_MERIDA"
@@ -955,9 +987,9 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios 
 
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 
-
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 
 #JOIN TWO STATES
@@ -986,7 +1018,9 @@ dfrCases <- generateGraphsForCases    (dfrConfirmedCaseswithAgregations,  nombre
 dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 dfrAllCases<- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
-generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
 boolsavetoFile <- TRUE
 strPathToSave<- paste(mydir,"/img",sep="")
@@ -995,3 +1029,4 @@ plotRstates(dfrAllR0, boolsavetoFile, strPathToSave)
 
 setwd(strPathToSave)
 write.csv(dfrAllCases, paste("AllCases-MX",".csv",sep=""))
+write.csv(dfrAllMortalityCases, paste("AllMortality-MX",".csv",sep=""))
