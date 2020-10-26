@@ -458,8 +458,7 @@ dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations , "Mexico", idaysFor
 dfrAllCases <- rbind(dfrAllCases,dfrCases)
 dfrAllR0<-rbind(dfrAllR0,dfrR0)
 
-dfrMortalityCases <-generateGraphsForMortality (dfrMortalityCases,imovingAverageDays , "Mexico", paste("Mexico","-Mortality",sep=""),poblacion)
-dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
+dfrAllMortalityCases <-generateGraphsForMortality (dfrMortalityCases,imovingAverageDays , "Mexico", paste("Mexico","-Mortality",sep=""),poblacion)
 #######################################
 #statewide
 #######################################
