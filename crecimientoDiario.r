@@ -865,6 +865,25 @@ dfrAllR0<-rbind(dfrAllR0,dfrR0)
 dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
 dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
 
+##################################### 22
+#Queretaro
+nombreMunicipios <-"ZM_QUERETARO"
+numeroMunicipios <-c (5,6,8,11,14)
+numeroEstados<-c(22)
+poblacion <-sum (dfrPoblacion[dfrPoblacion$estado %in% numeroEstados & dfrPoblacion$municipio %in% numeroMunicipios  , c("poblacion")]) /100000
+
+
+dfrmunicipalCases <- dfrConfirmedCases[dfrConfirmedCases$ENTIDAD_RES %in% numeroEstados & dfrConfirmedCases$MUNICIPIO_RES %in% numeroMunicipios,c("FECHA_INGRESO","RESULTADO_LAB","FECHA_DEF")]
+dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrmunicipalCases,imovingAverageDays )
+dfrCases <- generateGraphsForCases    (dfrConfirmedCaseswithAgregations,  nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",poblacion)
+dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations  , nombreMunicipios ,idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+
+dfrAllCases<- rbind(dfrAllCases,dfrCases)
+dfrAllR0<-rbind(dfrAllR0,dfrR0)
+
+dfrMortalityCases <- generateGraphsForMortality (dfrmunicipalCases,imovingAverageDays , nombreMunicipios, paste(nombreMunicipios,"-Mortality",sep=""),poblacion)
+dfrAllMortalityCases <-rbind(dfrAllMortalityCases,dfrMortalityCases)
+
 ##################################### 23
 nombreMunicipios <-"ZM_CANCUN"
 numeroMunicipios <-c (5)
