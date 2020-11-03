@@ -31,9 +31,11 @@ Windows= {install.packages("devtools")
 					install.packages("EpiEstim")
 					mydir <-  'E:/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario'
 					},
-Linux  = {print("I'm a penguin.")
+Linux  = {install.packages("devtools")
+					install.packages("EpiEstim")
+					mydir <-  '/home/joaquin/Documents/covid19/FechaIngreso-crecimientodiario'
 					},
-Darwin = {mydir <-  '/Users/joaquin/Documents/Mios2020/covid/FechaIngreso-crecimientodiario'
+Darwin = {mydir <-  '/Users/joaquin/Documents/covid19/FechaIngreso-crecimientodiario'
 					})
 
 #descomentar para Windows Portable
