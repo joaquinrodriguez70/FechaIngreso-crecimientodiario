@@ -29,7 +29,7 @@ options(repos = r)
 switch(Sys.info()[['sysname']],
 Windows= {install.packages("devtools")
 					install.packages("EpiEstim")
-					mydir <-  'E:/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario'
+					mydir <-  'C:/Users/joaqu/Documents/Mios2020/13-dev2020/covid19/FechaIngreso-crecimientodiario'
 					},
 Linux  = {install.packages("devtools")
 					install.packages("EpiEstim")
