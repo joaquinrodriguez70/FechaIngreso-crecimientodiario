@@ -1,3 +1,5 @@
 backup
 datos_abiertos_covid19.zip
 *.csv
+*.pbix
+tableros
