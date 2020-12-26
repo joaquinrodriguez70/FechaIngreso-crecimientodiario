@@ -15,7 +15,7 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 <br>En esta gráfica se muestra el cambio semanal de manera rápida, se muestra si hay tendencias de crecimiento o disminución así como se puede ver los máximos y mínimos a lo largo del tiempo.  
 	- Archivo *Nombre-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
-  <img src="./img/Mexico-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
+  <img src="./img/01-AcumuladovsPromedio7dias/Mexico-Acumvscurrent-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
 
 2. Curva epidémica de casos confirmados.
@@ -23,7 +23,7 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 <br>Esta curva es diaria donde se ve el hecho de que los fines de semana y asuetos hay menos casos que durante la semana. Esta curva permita ver el cambio de manera precisa, pero es mejor usar las curvas semanales para observar las tendencias.
 	- Archivo *Nombre-Casos-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
-  <img src="./img/Mexico-Casos-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
+  <img src="./img/02-CasosPromedio7dias/Mexico-Casos-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
 
 3. Gráfica de la velocidad de la epidemia semanal (promedio móvil de 7 días de casos positivos comparado con la semana anterior).
@@ -32,7 +32,7 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 <br>Pude encontrar una visualización similar en [Datos de inglaterra del 9 de junio](https://www.cebm.net/covid-19/covid-19-death-data-in-england-update-9th-june) así como en la manera en que se muestran los datos económicos.
 	- Archivo *Nombre-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
-  <img src="./img/Mexico-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
+  <img src="./img/04-velocidad/Mexico-CasosVsSemAnt-Confirmed-New-cases-Acum-7daysAvg.png" alt="Grafica comparativa Mexico" width="200">
 </p>
 
 4. Archivo separado por comas (CSV) con los datos de las tres gráficas anteriores
@@ -45,7 +45,7 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 <br>Muestra la velocidad de la mortalidad de la epidemia, se calcula diariamente, con los datos de la semana anterior.
 	- Archivo *Nombre-Mortality.png*
 <p align="left">
-  <img src="./img/Mexico-Mortality.png" width="200">
+  <img src="./img/06-mortality/Mexico-Mortality.png" width="200">
 </p>
 
 7. Archivo CSV con el cálculo de ritmo reproductivo básico.
@@ -55,21 +55,21 @@ También se calculan los valores del [Ritmo reproductivo básico] (https://es.wi
 <br>Se calcula con el paquete EpiEstim, el cual es el más reconocido para el cálculo de este indicador. La imagen tiene tres gráficas, la curva epidémica, el valor de R a lo largo del tiempo, valores mayores de uno, hay un crecimiento y menor de uno, indica un decrecimiento, El valor de R es muy sensible a los cambios en la semana anterior, por lo que se debe comparar con las demás gráficas.
 	- Archivo *Nombre-R Estimate.png*
 <p align="left">
-  <img src="./img/Mexico-R Estimate.png" width="200">
+  <img src="./img/08-r0/Mexico-R Estimate.png" width="200">
 </p>
 
 9. Gráfica de los casos por 100 mil habitantes por cada entidad o municipio.
 <br>Esta gráfica permite comparar la epidemia en los estados y ciduades bajo el mismo parámetro.
 	- Archivo *Nombre-CasosX100k-Confirmed-New-cases-Acum-7daysAvg*
 <p align="left">
-  <img src="./img/Mexico-CasosX100k-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
+  <img src="./img/05-casosx100k/Mexico-CasosX100k-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
 </p>
 
 10. Gráfica de la aceleracion de  casos (diferencia de velocidad en una semana).
 <br>La aceleración es el cambio de velocidad de los casos de la semana, la aceleración combinada con el número de casos existentes  puede indicar que tan grave es la epidemia en un momento dado.
 	- Archivo *Nombre-CasosVsSemAnt Accel-Confirmed-New-cases-Acum-7daysAvg.png*
 <p align="left">
-  <img src="./img/Mexico-CasosVsSemAnt Accel-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
+  <img src="./img/03-Aceleracion/Mexico-CasosVsSemAnt Accel-Confirmed-New-cases-Acum-7daysAvg.png" width="200">
 </p>
 
 
