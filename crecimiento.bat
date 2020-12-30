@@ -5,6 +5,6 @@ del /Q C:\Users\joaqu\Documents\Mios2020\13-dev2020\covid19\FechaIngreso-crecimi
 del /Q C:\Users\joaqu\Documents\Mios2020\13-dev2020\covid19\FechaIngreso-crecimientodiario\img\04-velocidad
 del /Q C:\Users\joaqu\Documents\Mios2020\13-dev2020\covid19\FechaIngreso-crecimientodiario\img\05-casosx100k
 del /Q C:\Users\joaqu\Documents\Mios2020\13-dev2020\covid19\FechaIngreso-crecimientodiario\img\06-mortality
-del /Q C:\Users\joaqu\Documents\Mios2020\13-dev2020\covid19\FechaIngreso-crecimientodiario\img\07-mortality
+del /Q C:\Users\joaqu\Documents\Mios2020\13-dev2020\covid19\FechaIngreso-crecimientodiario\img\07-mortalityx100k
 del /Q C:\Users\joaqu\Documents\Mios2020\13-dev2020\covid19\FechaIngreso-crecimientodiario\img\08-r0
 C:\Users\joaqu\Documents\Apps\rportable\R-Portable\App\R-Portable\bin\x64\Rscript.exe  --no-save  C:/Users/joaqu/Documents/Mios2020/13-dev2020/covid19/FechaIngreso-crecimientodiario/crecimientoDiario.r
