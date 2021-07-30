@@ -150,7 +150,7 @@ generatePlotForAccumulatedandCurrentCases <- function(dfrCasesDataFrame , Provin
 generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysToAverage, boolsavetoFile,strPathToSave,strFilename,poblacion){
 
 	setwd(paste(strPathToSave,"/02-CasosPromedio7dias", sep=""))
-	
+
 	campo="FECHA_INGRESO"
 	print(paste("Calculating ->",ProvinceTxt))
     dfrCasesDataFrame[,"POB"] <- poblacion
@@ -213,7 +213,7 @@ generateWeeklyChangeCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgno
 					 col = colores)
 
 	dev.off()
-	
+
 	setwd(paste(strPathToSave,"/03-Aceleracion", sep=""))
 	png(paste(ProvinceTxt, "-CasosVsSemAnt Accel",strFilename ,".png", sep=""), width = 1024, height = 768)
 
@@ -392,7 +392,6 @@ generateRandPlot<- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, daysTo
 ##############################################
 
 aggregateCases <- function(dfrCasesDataFrame,daysToAverage ){
-
 	dfrCasesDataFrame <- aggregate(formula = RESULTADO_LAB ~ FECHA_INGRESO , FUN = sum, data = dfrCasesDataFrame)
 
 
@@ -442,7 +441,7 @@ if (TRUE) {
 	unzip (strFilename, unzipfile$Name)
 	dfrConfirmedCases <- read.csv ( file=unzipfile$Name)
 } else {
-	dfrConfirmedCases <- read.csv ("./201008COVID19MEXICO.csv")
+	dfrConfirmedCases <- read.csv ("./210728COVID19MEXICO.csv")
 }
 #fill state names
 vecListaEstados <- c(1:32)
@@ -459,8 +458,9 @@ setwd(mydir)
 #######################################
 #Keep only confirmed case
 poblacion <- sum(dfrPoblacion [,c('poblacion')]) / 100000
-dfrConfirmedCases <- dfrConfirmedCases [ dfrConfirmedCases$RESULTADO_LAB == strConfirmedResult,c("FECHA_INGRESO","RESULTADO_LAB","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF")]
-dfrMortalityCases <- dfrConfirmedCases [ dfrConfirmedCases$FECHA_DEF != notDead,c("FECHA_INGRESO","RESULTADO_LAB","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF")]
+dfrConfirmedCases <- dfrConfirmedCases [ dfrConfirmedCases$CLASIFICACION_FINAL %in% c("1","2","3") ,c("FECHA_INGRESO","RESULTADO_LAB","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF","CLASIFICACION_FINAL")]
+dfrMortalityCases <- dfrConfirmedCases [ dfrConfirmedCases$FECHA_DEF != notDead,c("FECHA_INGRESO","RESULTADO_LAB","ENTIDAD_RES","MUNICIPIO_RES","FECHA_DEF","CLASIFICACION_FINAL")]
+dfrConfirmedCases[,"RESULTADO_LAB"] = 1
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrConfirmedCases,imovingAverageDays )
 dfrCases <- generateGraphsForCases    (dfrConfirmedCaseswithAgregations , "Mexico", idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",poblacion)
 
