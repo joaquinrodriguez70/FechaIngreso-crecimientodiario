@@ -29,7 +29,7 @@ options(repos = r)
 switch(Sys.info()[['sysname']],
 Windows= {install.packages("devtools")
 					install.packages("EpiEstim")
-					mydir <-  'C:/Users/joaqu/Documents/Mios2020/13-dev2020/covid19/FechaIngreso-crecimientodiario'
+					mydir <-  'C:/Users/joaqu/OneDrive/Documentos/Mios2020/13-dev2020/covid19/FechaIngreso-crecimientodiario'
 					},
 Linux  = {install.packages("devtools")
 					install.packages("EpiEstim")
@@ -181,7 +181,7 @@ generateEpidemicCurve <- function(dfrCasesDataFrame , ProvinceTxt,daysToIgnore, 
 						names.arg=head(dfrCasesDataFrame[,c(campo)],-daysToIgnore),
 						 main=paste("Nuevos Casos Semanal por 100k",ProvinceTxt,day_1,"a",maxDate),
 						 las=2,
-						 ylim=c(0,200),
+						 ylim=c(0,800),
 						 col ="#0066cc")
 
 		dev.off()
