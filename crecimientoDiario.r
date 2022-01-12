@@ -47,7 +47,7 @@ library(EpiEstim)
 strUrl <-  'http://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip'
 strFilename <- 'datos_abiertos_covid19.zip'
 strConfirmedResult  = 1
-idaysForGraphToCutOff = 7
+idaysForGraphToCutOff = 1
 imovingAverageDays = 7
 notDead = '9999-99-99'
 dfrAllCases = data.frame(stringsAsFactors = FALSE)
