@@ -43,7 +43,7 @@ library(devtools)
 library(EpiEstim)
 
 
-#mydir <-  'E:/misdoc/Mios2020/covid19/FechaIngreso-crecimientodiario'
+
 strUrl <-  'http://datosabiertos.salud.gob.mx/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip'
 strFilename <- 'datos_abiertos_covid19.zip'
 strConfirmedResult  = 1
@@ -435,13 +435,13 @@ aggregateMortalityCases <- function(dfrCasesDataFrame,daysToAverage ){
 
 #download and load into dataframe
 setwd(mydir)
-if (TRUE) {
+if (FALSE) {
 	download.file(strUrl, strFilename )
 	unzipfile <- unzip (strFilename, list = TRUE)
 	unzip (strFilename, unzipfile$Name)
 	dfrConfirmedCases <- read.csv ( file=unzipfile$Name)
 } else {
-	dfrConfirmedCases <- read.csv ("./210728COVID19MEXICO.csv")
+	dfrConfirmedCases <- read.csv ("./220121COVID19MEXICO.csv")
 }
 #fill state names
 vecListaEstados <- c(1:32)
