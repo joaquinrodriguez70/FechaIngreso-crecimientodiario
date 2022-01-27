@@ -441,7 +441,7 @@ if (FALSE) {
 	unzip (strFilename, unzipfile$Name)
 	dfrConfirmedCases <- read.csv ( file=unzipfile$Name)
 } else {
-	dfrConfirmedCases <- read.csv ("./220121COVID19MEXICO.csv")
+	dfrConfirmedCases <- read.csv ("./220126COVID19MEXICO.csv")
 }
 #fill state names
 vecListaEstados <- c(1:32)
