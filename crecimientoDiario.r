@@ -441,7 +441,7 @@ if (FALSE) {
 	unzip (strFilename, unzipfile$Name)
 	dfrConfirmedCases <- read.csv ( file=unzipfile$Name)
 } else {
-	dfrConfirmedCases <- read.csv ("./220209COVID19MEXICO.csv")
+	dfrConfirmedCases <- read.csv ("./220717COVID19MEXICO.csv")
 }
 #fill state names
 vecListaEstados <- c(1:32)
@@ -464,9 +464,9 @@ dfrConfirmedCases[,"RESULTADO_LAB"] = 1
 dfrConfirmedCaseswithAgregations  <-aggregateCases (dfrConfirmedCases,imovingAverageDays )
 dfrCases <- generateGraphsForCases    (dfrConfirmedCaseswithAgregations , "Mexico", idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg",poblacion)
 
-dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations , "Mexico", idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
+#dfrR0<- generateRandPlot  (dfrConfirmedCaseswithAgregations , "Mexico", idaysForGraphToCutOff , imovingAverageDays, TRUE, paste(mydir,"/img",sep=""),"-Confirmed-New-cases-Acum-7daysAvg")
 dfrAllCases <- rbind(dfrAllCases,dfrCases)
-dfrAllR0<-rbind(dfrAllR0,dfrR0)
+#dfrAllR0<-rbind(dfrAllR0,dfrR0)
 
 dfrAllMortalityCases <-generateGraphsForMortality (dfrMortalityCases,imovingAverageDays , "Mexico", paste("Mexico","-Mortality",sep=""),paste(mydir,"/img",sep=""),poblacion)
 #######################################
