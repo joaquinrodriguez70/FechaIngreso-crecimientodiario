@@ -27,7 +27,8 @@ options(repos = r)
 
 
 switch(Sys.info()[['sysname']],
-Windows= {install.packages("devtools")
+Windows= {
+					#install.packages("devtools")
 					install.packages("EpiEstim")
 					mydir <-  'C:/Users/joaqu/OneDrive/Documentos/Mios2020/13-dev2020/covid19/FechaIngreso-crecimientodiario'
 					},
@@ -39,7 +40,7 @@ Darwin = {mydir <-  '/Users/joaquin/Documents/covid19/FechaIngreso-crecimientodi
 					})
 
 #descomentar para Windows Portable
-library(devtools)
+#library(devtools)
 library(EpiEstim)
 
 
@@ -441,7 +442,7 @@ if (FALSE) {
 	unzip (strFilename, unzipfile$Name)
 	dfrConfirmedCases <- read.csv ( file=unzipfile$Name)
 } else {
-	dfrConfirmedCases <- read.csv ("./220717COVID19MEXICO.csv")
+	dfrConfirmedCases <- read.csv ("./220808COVID19MEXICO.csv")
 }
 #fill state names
 vecListaEstados <- c(1:32)
